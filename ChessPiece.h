@@ -13,17 +13,18 @@ enum class ChessType {
     BISHOP,
     ROOK,
     KNIGHT,
-    PAWN
+    PAWN,
+    EMPTY
 };
 
 class ChessPiece {
     ChessType type;
     ChessBoard* board;
     Player* owner;
-    Position position;
     bool alive;
 public:
-    ChessPiece(ChessType type, ChessBoard* board, Player* owner, int row, int col);
+    ChessPiece(ChessType type, ChessBoard* board, Player* owner);
+    ChessType getType();
     bool isAlive();
     bool isMovePossiblyValid(Move move);
     std::vector<Move> getAvailableMoves();
