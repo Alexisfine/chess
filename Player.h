@@ -1,4 +1,3 @@
-
 #ifndef CHESS_PLAYER_H
 #define CHESS_PLAYER_H
 
