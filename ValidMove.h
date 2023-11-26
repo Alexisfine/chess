@@ -4,6 +4,7 @@
 
 #include "Move.h"
 
+class ChessPiece;
 class ValidMove : public Move {
     bool canCapture;
     bool canCheck;
@@ -12,6 +13,7 @@ public:
     bool operator<(const ValidMove& other) const;
     Position getStart() const;
     Position getEnd() const;
+
 };
 
 
