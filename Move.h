@@ -9,12 +9,12 @@
 class Move {
     Position start;
     Position end;
-    ChessPiece* chessPiece;
+    const ChessPiece* chessPiece;
 public:
-    Move(Position start, Position end, ChessPiece* chessPiece);
+    Move(Position start, Position end, const ChessPiece* chessPiece);
     const Position& getStart() const;
     const Position& getEnd() const;
-    ChessPiece* getChessPiece();
+    const ChessPiece* getChessPiece() const;
     friend bool operator==(const Move& a, const Move& b);
 };
 
