@@ -5,7 +5,9 @@
 #include "Player.h"
 
 class HumanPlayer : public Player {
-
+public:
+    HumanPlayer(int playerNo, ChessBoard* board, const ChessColor& color);
+    bool makeMove(const Move& move) override;
 };
 
 

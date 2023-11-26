@@ -5,6 +5,7 @@
 #include "ChessBoard.h"
 
 class Player {
+protected:
     int playerNo;
     bool isComputer;
     const ChessColor& color;
