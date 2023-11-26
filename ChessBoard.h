@@ -12,8 +12,10 @@ public:
     ChessBoard(int dimension);
     virtual void makeMove(Move move) = 0;
     virtual bool isMoveLegal(Move move) = 0;
-    ChessType getPieceAtPosition(Position pos);
-    void setPieceAtPosition(Position pos, ChessPiece* piece);
+    virtual bool isValidPos(Position& pos) = 0;
+    bool isPositionEmpty(Position& pos);
+    ChessPiece* getPieceAtPosition(Position& pos);
+    void setPieceAtPosition(Position& pos, ChessPiece& piece);
 };
 
 #endif //CHESS_CHESSBOARD_H

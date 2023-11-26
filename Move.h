@@ -4,13 +4,14 @@
 
 #include "Position.h"
 #include "ChessPiece.h"
+#include <memory>
 
 class Move {
-    Position start;
-    Position end;
-    ChessPiece& chessPiece;
+    Position& start;
+    Position& end;
+    ChessPiece* chessPiece;
 public:
-    Move(Position start, Position end, ChessPiece& chessPiece);
+    Move(Position& start, Position& end, ChessPiece* chessPiece);
 };
 
 
