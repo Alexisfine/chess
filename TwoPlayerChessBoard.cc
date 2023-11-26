@@ -6,13 +6,13 @@ bool TwoPlayerChessBoard::makeMove(const Move& move, const Player& player) {
     if (!isMoveLegal(move, player)) return false;
 
     // if new position contains a chess from the opponent, remove it
-    if (!isPositionEmpty(move.getEnd()) && !isPositionOccupiedByPlayer(move.getEnd(), player)) {
-        // capture this chess
-        ChessPiece* capturedChess = getCellAtPos(move.getEnd()).getChessPiece();
-        if (capturedChess) {
-            removePieceAtPosition(move.getEnd());
-            capturedChess->changeAliveState();
-        }
+    if (!isPositionEmpty(move.getEnd()) && isPositionOccupiedByPlayer(move.getEnd(),player)) return false;
+
+    // capture this chess
+    ChessPiece* capturedChess = getCellAtPos(move.getEnd()).getChessPiece();
+    if (capturedChess) {
+        removePieceAtPosition(move.getEnd());
+        capturedChess->changeAliveState();
     }
 
     // move chess to new position
