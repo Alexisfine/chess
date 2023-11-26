@@ -4,9 +4,13 @@ King::King(ChessBoard& board, Player& owner) :
         ChessPiece{ChessType::KING, board, owner} {}
 
 bool King::isMovePossiblyValid(Move& move) const {
-
+    std::vector<Move> possibleValidMoves = getAvailableMoves(move.getStart());
+    for (auto validMove : possibleValidMoves) {
+        if (move == validMove) return true;
+    }
+    return false;
 }
-std::vector<Move> King::getAvailableMoves(Position& curPosition) {
+std::vector<Move> King::getAvailableMoves(const Position& curPosition) const {
     std::vector<Move> moves;
     for (int dx = -1; dx <= 1; ++dx) {
         for (int dy = -1; dy <= 1; ++dy) {

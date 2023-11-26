@@ -6,11 +6,11 @@ class Position {
     int row, col;
 public:
     Position(int row, int col);
-    int getRow();
-    int getCol();
+    int getRow() const;
+    int getCol() const;
     void setRow(int row);
     void setCol(int col);
 };
-
+bool operator==(const Position& a, const Position& b);
 
 #endif //CHESS_POSITION_H
