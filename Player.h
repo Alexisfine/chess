@@ -7,9 +7,10 @@
 class Player {
     int playerNo;
     bool isComputer;
+    const ChessColor& color;
     ChessBoard* board;
 public:
-    Player(int playerNo, bool isComputer, ChessBoard* board);
+    Player(int playerNo, bool isComputer, ChessBoard* board, const ChessColor& color);
     virtual bool makeMove(const Move& move) = 0;
 };
 

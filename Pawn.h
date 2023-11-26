@@ -3,7 +3,9 @@
 #include "ChessPiece.h"
 
 class Pawn : public ChessPiece {
-
+    Pawn(ChessBoard& board, Player& player);
+    bool isMovePossiblyValid(const Move& move) const override;
+    std::vector<ValidMove> getAvailableMoves(const Position& curPosition) override;
 };
 
 

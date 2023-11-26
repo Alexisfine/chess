@@ -7,6 +7,7 @@
 #include <memory>
 
 class Move {
+protected:
     Position start;
     Position end;
     ChessPiece* chessPiece;
@@ -15,9 +16,7 @@ public:
     const Position& getStart() const;
     const Position& getEnd() const;
     ChessPiece* getChessPiece();
-    friend bool operator==(const Move& a, const Move& b);
 };
 
-bool operator==(const Move& a, const Move& b);
 
 #endif //CHESS_MOVE_H

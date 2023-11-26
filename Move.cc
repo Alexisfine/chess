@@ -12,7 +12,3 @@ const Position& Move::getEnd() const{
 ChessPiece* Move::getChessPiece() {
     return chessPiece;
 }
-
-bool operator==(const Move& a, const Move& b) {
-    return a.start == b.start && a.end == b.end && a.chessPiece == b.chessPiece;
-}
