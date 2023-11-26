@@ -2,8 +2,15 @@
 #define CHESS_PLAYER_H
 
 
-class Player {
+#include "ChessBoard.h"
 
+class Player {
+    int playerNo;
+    bool isComputer;
+    ChessBoard* board;
+public:
+    Player(int playerNo, bool isComputer, ChessBoard* board);
+    virtual bool makeMove(const Move& move) = 0;
 };
 
 
