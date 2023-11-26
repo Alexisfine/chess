@@ -1,5 +1,6 @@
 #include "ChessBoard.h"
 
+ChessBoard::ChessBoard(int dimension) : dimension{dimension} {}
 ChessPiece* ChessBoard::getPieceAtPosition(Position& pos) {
     return board[pos.getRow()][pos.getCol()].getChessPiece();
 }
