@@ -27,11 +27,12 @@ public:
     ChessPiece(ChessType type, ChessBoard& board, Player& owner);
     virtual ~ChessPiece();
     ChessType getType() const;
-    Player& getOwner() const;
+    Player& getOwner();
     bool isAlive() const;
     void changeAliveState();
     virtual bool isMovePossiblyValid(Move& move) const = 0;
-    virtual std::vector<Move> getAvailableMoves(Position& curPosition) = 0;
+    virtual std::vector<Move> getAvailableMoves(const Position& curPosition) const = 0;
 };
 
+bool operator==(const ChessPiece& a, const ChessPiece& b);
 #endif //CHESS_CHESSPIECE_H

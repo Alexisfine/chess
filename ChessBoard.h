@@ -6,16 +6,17 @@
 #include "Cell.h"
 
 class ChessBoard {
+protected:
     int dimension;
     std::vector<std::vector<Cell>> board;
 public:
     ChessBoard(int dimension);
-    virtual void makeMove(Move move) = 0;
-    virtual bool isMoveLegal(Move move) = 0;
-    virtual bool isValidPos(Position& pos) = 0;
-    bool isPositionEmpty(Position& pos);
-    ChessPiece* getPieceAtPosition(Position& pos);
-    void setPieceAtPosition(Position& pos, ChessPiece& piece);
+    virtual bool makeMove(const Move& move) = 0;
+    virtual bool isMoveLegal(const Move& move) = 0;
+    virtual bool isValidPos(const Position& pos) = 0;
+    bool isPositionEmpty(const Position& pos);
+    ChessPiece* getPieceAtPosition(const Position& pos);
+    void setPieceAtPosition(const Position& pos, ChessPiece& piece);
 };
 
 #endif //CHESS_CHESSBOARD_H

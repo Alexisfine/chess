@@ -8,10 +8,19 @@ ChessPiece::~ChessPiece() {
 ChessType ChessPiece::getType() const {
     return type;
 }
+
+Player& ChessPiece::getOwner() {
+    return owner;
+}
+
 bool ChessPiece::isAlive() const {
     return alive;
 }
 
 void ChessPiece::changeAliveState() {
     alive = !alive;
+}
+
+bool operator==(const ChessPiece& a, const ChessPiece& b) {
+    return a.getType() == b.getType();
 }

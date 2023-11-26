@@ -7,7 +7,7 @@ class King : public ChessPiece {
 public:
     King(ChessBoard& board, Player& owner);
     bool isMovePossiblyValid(Move& move) const override;
-    std::vector<Move> getAvailableMoves(Position& curPosition) override;
+    std::vector<Move> getAvailableMoves(const Position& curPosition) const override;
 };
 
 
