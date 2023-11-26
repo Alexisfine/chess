@@ -12,8 +12,8 @@ class Move {
     ChessPiece* chessPiece;
 public:
     Move(Position start, Position end, ChessPiece* chessPiece);
-    Position getStart();
-    Position getEnd();
+    const Position& getStart() const;
+    const Position& getEnd() const;
     ChessPiece* getChessPiece();
     friend bool operator==(const Move& a, const Move& b);
 };

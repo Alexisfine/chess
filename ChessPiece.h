@@ -30,7 +30,7 @@ public:
     Player& getOwner();
     bool isAlive() const;
     void changeAliveState();
-    virtual bool isMovePossiblyValid(Move& move) const = 0;
+    virtual bool isMovePossiblyValid(const Move& move) const = 0;
     virtual std::vector<Move> getAvailableMoves(const Position& curPosition) const = 0;
 };
 

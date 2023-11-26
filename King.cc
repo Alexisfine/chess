@@ -3,7 +3,7 @@
 King::King(ChessBoard& board, Player& owner) :
         ChessPiece{ChessType::KING, board, owner} {}
 
-bool King::isMovePossiblyValid(Move& move) const {
+bool King::isMovePossiblyValid(const Move& move) const {
     std::vector<Move> possibleValidMoves = getAvailableMoves(move.getStart());
     for (auto validMove : possibleValidMoves) {
         if (move == validMove) return true;
@@ -17,7 +17,8 @@ std::vector<Move> King::getAvailableMoves(const Position& curPosition) const {
             if (dx == 0 && dy == 0) continue;
             Position newPosition {curPosition.getRow() + dx, curPosition.getCol() + dy};
             if (!board.isValidPos(newPosition)) continue; // check if newPosition is within the grid
-            ChessPiece* curChessPiece = board.getPieceAtPosition(newPosition);
+            const Cell& cell = board.getCellAtPos(newPosition);
+            ChessPiece* curChessPiece = cell.getChessPiece();
             if (&curChessPiece->getOwner() == &owner) continue; // position is occupied by player's own chess
             Move possibleMove {curPosition, newPosition, this};
             moves.emplace_back(possibleMove);

@@ -11,12 +11,14 @@ protected:
     std::vector<std::vector<Cell>> board;
 public:
     ChessBoard(int dimension);
-    virtual bool makeMove(const Move& move) = 0;
-    virtual bool isMoveLegal(const Move& move) = 0;
-    virtual bool isValidPos(const Position& pos) = 0;
-    bool isPositionEmpty(const Position& pos);
-    ChessPiece* getPieceAtPosition(const Position& pos);
+    virtual bool makeMove(const Move& move, const Player& player) = 0;
+    virtual bool isMoveLegal(const Move& move, const Player& player) const = 0;
+    virtual bool isValidPos(const Position& pos) const = 0;
+    bool isPositionEmpty(const Position& pos) const;
+    bool isPositionOccupiedByPlayer(const Position& pos, const Player& player) const;
+    const Cell& getCellAtPos(const Position& pos) const;
     void setPieceAtPosition(const Position& pos, ChessPiece& piece);
+    void removePieceAtPosition(const Position& pos);
 };
 
 #endif //CHESS_CHESSBOARD_H
