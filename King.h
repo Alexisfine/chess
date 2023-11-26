@@ -5,9 +5,9 @@
 
 class King : public ChessPiece {
 public:
-    King(ChessBoard& board, Player& owner);
+    King(ChessBoard& board, Player& player);
     bool isMovePossiblyValid(const Move& move) const override;
-    std::vector<Move> getAvailableMoves(const Position& curPosition) const override;
+    std::vector<ValidMove> getAvailableMoves(const Position& curPosition) override;
 };
 
 

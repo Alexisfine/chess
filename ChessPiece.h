@@ -5,6 +5,7 @@
 #include "Position.h"
 #include "Player.h"
 #include "Move.h"
+#include "ValidMove.h"
 #include <vector>
 #include <memory>
 
@@ -17,12 +18,19 @@ enum class ChessType {
     PAWN
 };
 
+enum class ChessColor {
+    WHITE,
+    BLACK,
+    RED,
+    BLUE
+};
+
 class ChessPiece {
 protected:
     ChessType type;
     ChessBoard& board;
-    Player& owner;
     bool alive;
+    Player& owner;
 public:
     ChessPiece(ChessType type, ChessBoard& board, Player& owner);
     virtual ~ChessPiece();
@@ -31,7 +39,7 @@ public:
     bool isAlive() const;
     void changeAliveState();
     virtual bool isMovePossiblyValid(const Move& move) const = 0;
-    virtual std::vector<Move> getAvailableMoves(const Position& curPosition) const = 0;
+    virtual std::vector<ValidMove> getAvailableMoves(const Position& curPosition) = 0;
 };
 
 bool operator==(const ChessPiece& a, const ChessPiece& b);
