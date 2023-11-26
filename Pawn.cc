@@ -1,7 +1,3 @@
-//
-// Created by 薛景帝 on 2023/11/24.
-//
-
 #include "Pawn.h"
 
 Pawn::Pawn(ChessBoard& board, Player& owner) :
@@ -25,3 +21,4 @@ std::vector<Move> Pawn::getAvailableMoves(const Position& curPosition) const {
     Move possibleMove {curPosition, newPosition, this};
     moves.emplace_back(possibleMove);
 }
+

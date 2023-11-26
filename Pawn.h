@@ -6,6 +6,7 @@ class Pawn : public ChessPiece {
     Pawn(ChessBoard& board, Player& player);
     bool isMovePossiblyValid(const Move& move) const override;
     std::vector<Move> getAvailableMoves(const Position& curPosition) const override;
+
 };
 
 
