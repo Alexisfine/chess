@@ -15,9 +15,9 @@ class Cell {
     ChessPiece* chessPiece;
 public:
     Cell(int row, int col);
-    ChessPiece* getChessPiece();
-    bool isOccupied();
-    bool isOccupiedByMe(Player& player);
+    ChessPiece* getChessPiece() const;
+    bool isOccupied() const;
+    bool isOccupiedByMe(const Player& player) const;
     void addChessPiece(ChessPiece& newChessPiece);
     void removeChessPiece();
 };

@@ -7,9 +7,9 @@
 class TwoPlayerChessBoard : public ChessBoard {
 public:
     TwoPlayerChessBoard(int dimension);
-    bool makeMove(const Move& move) override;
-    bool isMoveLegal(const Move& move) override;
-    bool isValidPos(const Position& pos) override;
+    bool makeMove(const Move& move, const Player& player) override;
+    bool isMoveLegal(const Move& move, const Player& player) const override;
+    bool isValidPos(const Position& pos) const override;
 };
 
 

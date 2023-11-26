@@ -3,10 +3,10 @@
 Move::Move(Position start, Position end, ChessPiece* chessPiece) :
     start{start},end{end}, chessPiece{chessPiece} {}
 
-Position Move::getStart() {
+const Position& Move::getStart() const{
     return start;
 }
-Position Move::getEnd() {
+const Position& Move::getEnd() const{
     return end;
 }
 ChessPiece* Move::getChessPiece() {

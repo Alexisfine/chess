@@ -2,15 +2,15 @@
 
 Cell::Cell(int row, int col) : row{row}, col{col}, state{CellState::EMPTY}, chessPiece{nullptr} {}
 
-ChessPiece* Cell::getChessPiece() {
+ChessPiece* Cell::getChessPiece() const {
     return chessPiece;
 }
 
-bool Cell::isOccupied() {
+bool Cell::isOccupied() const {
     return state == CellState::OCCUPIED;
 }
 
-bool Cell::isOccupiedByMe(Player& player) {
+bool Cell::isOccupiedByMe(const Player& player) const {
     if (state == CellState::EMPTY) return false;
     return &chessPiece->getOwner() == &player;
 }
