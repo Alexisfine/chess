@@ -1,6 +1,6 @@
 #include "Move.h"
 
-Move::Move(Position start, Position end, ChessPiece* chessPiece) :
+Move::Move(Position start, Position end, const ChessPiece* chessPiece) :
     start{start},end{end}, chessPiece{chessPiece} {}
 
 const Position& Move::getStart() const{
@@ -9,6 +9,6 @@ const Position& Move::getStart() const{
 const Position& Move::getEnd() const{
     return end;
 }
-ChessPiece* Move::getChessPiece() {
+const ChessPiece* Move::getChessPiece() const{
     return chessPiece;
 }
