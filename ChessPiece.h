@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "Move.h"
 #include <vector>
+#include <memory>
 
 enum class ChessType {
     KING,
@@ -13,23 +14,24 @@ enum class ChessType {
     BISHOP,
     ROOK,
     KNIGHT,
-    PAWN,
-    EMPTY
+    PAWN
 };
 
 class ChessPiece {
+protected:
     ChessType type;
-    ChessBoard* board;
-    Player* owner;
+    ChessBoard& board;
+    Player& owner;
     bool alive;
 public:
-    ChessPiece(ChessType type, ChessBoard* board, Player* owner);
-    ChessType getType();
-    bool isAlive();
-    bool isMovePossiblyValid(Move move);
-    std::vector<Move> getAvailableMoves();
-    virtual ~ChessPiece() = 0;
+    ChessPiece(ChessType type, ChessBoard& board, Player& owner);
+    virtual ~ChessPiece();
+    ChessType getType() const;
+    Player& getOwner() const;
+    bool isAlive() const;
+    void changeAliveState();
+    virtual bool isMovePossiblyValid(Move& move) const = 0;
+    virtual std::vector<Move> getAvailableMoves(Position& curPosition) = 0;
 };
-
 
 #endif //CHESS_CHESSPIECE_H
