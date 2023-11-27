@@ -22,7 +22,7 @@ bool ComputerPlayer::oneMove() {
     if (level == 1) {
     std::vector<Cell> allChessPiece; //a vector of all possible movable chesspieces
     for (int i = 1; i <= board->getDimension(); i++) {
-        for (int j = 1; j <= 8; j++) {
+        for (int j = 1; j <= board->getDimension(); j++) {
             const Position p {i,j};
             if (board->getCellAtPos(p).getState() == CellState::EMPTY) continue; //if the cell is empty
             if (board->getCellAtPos(p).getChessPiece()->getOwner().getColor() == color) {
