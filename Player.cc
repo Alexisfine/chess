@@ -6,3 +6,6 @@ Player::Player(int playerNo, bool isComputer, ChessBoard* board, const ChessColo
 int Player::getPlayerNo() const {
     return playerNo;
 }
+const ChessColor Player::getColor() const{
+    return color;
+}
