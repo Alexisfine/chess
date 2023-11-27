@@ -18,32 +18,32 @@ int randomint(int size) {
 }
 
 bool ComputerPlayer::oneMove() {
-    //LEVEL1: random legal moves
+    //LEVEL1: Random legal moves
     if (level == 1) {
-    std::vector<Cell> cp; //a vector of all possible movable chesspieces
-    for (int i = 1; i <=8; i++) {
+    std::vector<Cell> allChessPiece; //a vector of all possible movable chesspieces
+    for (int i = 1; i <= board->getDimension(); i++) {
         for (int j = 1; j <= 8; j++) {
             const Position p {i,j};
             if (board->getCellAtPos(p).getState() == CellState::EMPTY) continue; //if the cell is empty
             if (board->getCellAtPos(p).getChessPiece()->getOwner().getColor() == color) {
-                cp.emplace_back(board->getCellAtPos(p));
+                allChessPiece.emplace_back(board->getCellAtPos(p));
             }
         }
     }
-    //select a random cell from cp
+    //select a random cell from AllChessPiece
     while (true) {
-        if (cp.empty()) return false; //if there are no movable chesspieces, return false
-        int randomindex = randomint(cp.size() - 1); //generate a random integer
-        Cell randomcell = cp[randomindex];
+        if (allChessPiece.empty()) return false; //if there are no movable chesspieces, return false
+        int randomIndex = randomint(allChessPiece.size() - 1); //generate a random integer
+        Cell randomCell = allChessPiece[randomIndex];
         //select a random move
-        Position pos = randomcell.getPosition();
-        std::vector<ValidMove> allrandommove = randomcell.getChessPiece()->getAvailableMoves(pos); 
-        if (allrandommove.empty()) {
-            cp.erase(cp.begin() + randomindex); //remove this chesspiece that has no valid moves
+        Position pos = randomCell.getPosition();
+        std::vector<ValidMove> allRandomMove = randomCell.getChessPiece()->getAvailableMoves(pos); 
+        if (allRandomMove.empty()) {
+            allChessPiece.erase(allChessPiece.begin() + randomIndex); //remove this chesspiece that has no valid moves
             continue; //reselect a cell
         }
-        Move randommove = allrandommove[randomint(allrandommove.size() - 1)];
-        board->makeMove(randommove, *this);
+        Move randomMove = allRandomMove[randomint(allRandomMove.size() - 1)];
+        board->makeMove(randomMove, *this);
         return true;
     }
 }
