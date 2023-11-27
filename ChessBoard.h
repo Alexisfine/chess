@@ -19,6 +19,7 @@ public:
     const Cell& getCellAtPos(const Position& pos) const;
     void setPieceAtPosition(const Position& pos, ChessPiece& piece);
     void removePieceAtPosition(const Position& pos);
+    int getDimension() const;
 };
 
 #endif //CHESS_CHESSBOARD_H

@@ -1,155 +1,79 @@
-//
-// Created by 薛景帝 on 2023/11/24.
-//
-
 #include "Queen.h"
 
 Queen::Queen(ChessBoard& board, Player& owner):
     ChessPiece(ChessType::QUEEN, board, owner) {}
 
-bool Queen::isMovePossiblyValid(const Move& move) const {
-    std::vector<Move> possibleValidMoves = getAvailableMoves(move.getStart());
+bool Queen::isMovePossiblyValid(const Move& move)  {
+    std::vector<ValidMove> possibleValidMoves = getAvailableMoves(move.getStart());
     for (auto validMove : possibleValidMoves) {
-        if (move == validMove) return true;
+        if (move.getStart() == validMove.getStart() && move.getEnd() == validMove.getEnd()) return true;
     }
     return false;
 }
 
-std::vector<Move> Queen::getAvailableMoves(const Position& curPosition) const {
-    std::vector<Move> moves;
-    const int MAX = 8;
+void Queen::addPossibleMoveByDirection(std::vector<ValidMove> possibleMoves,
+                                const Position& curPosition, int dy, int dx, int maxMoves) {
+    int curRow = curPosition.getRow();
+    int curCol = curPosition.getCol();
+    for (int x = 0; x < maxMoves; x++) {
+        Position newPosition {curRow + dy, curCol + dx};
+        if (!board.isValidPos(newPosition)) return; // check if position is valid
+        const Cell& cell = board.getCellAtPos(newPosition);
+        bool canCapture = false;
+        bool canCheck = false;
+        if (cell.isOccupied()) {
+            canCapture = true;
+            if (!cell.isOccupiedByMe(owner)) {
+                ValidMove possibleMove {curPosition, newPosition, this, canCapture, canCheck};
+                possibleMoves.emplace_back(possibleMove);
+            }
+            break; //cannot move pass another chesspiece
+        }
+        //if the cell is not occupied
+        ValidMove possibleMove {curPosition, newPosition, this, canCapture, canCheck};
+        possibleMoves.emplace_back(possibleMove);
+
+        // update curRow, curCol
+        curRow += dy;
+        curCol += dx;
+    }
+
+}
+std::vector<ValidMove> Queen::getAvailableMoves(const Position& curPosition)  {
+    std::vector<ValidMove> moves;
+    const int dimension = board.getDimension();
     int curRow = curPosition.getRow();
     int curCol = curPosition.getCol();
     //maximum number of moves, without considering blocks
-    int RX = MAX - curCol - 1;
-    int LX = -curCol + 1;
-    int upY = MAX - curRow - 1;
-    int downY = -curRow + 1;
+    int RX = dimension - curCol;
+    int LX = curCol - 1;
+    int upY = dimension - curRow;
+    int downY = curRow - 1;
     //move right
-    for (int dx = 1; dx <= RX; ++dx) {
-        Position newPosition {curRow, curCol + dx};
-        const Cell& cell = board.getCellAtPos(newPosition);
-        if (cell.isOccupied()) {
-            if (!cell.isOccupiedByMe(owner)) {
-                Move possibleMove {curPosition, newPosition, this};
-                moves.emplace_back(possibleMove);
-            }
-            break; //cannot move pass another chesspiece
-        }
-        //if the cell is not occupied
-        Move possibleMove {curPosition, newPosition, this};
-        moves.emplace_back(possibleMove);
-    }
+    addPossibleMoveByDirection(moves, curPosition, 0, 1, RX);
+
     //move left
-    for (int dx = -1; dx >= LX; --dx) {
-        Position newPosition {curRow, curCol + dx};
-        const Cell& cell = board.getCellAtPos(newPosition);
-        if (cell.isOccupied()) {
-            if (!cell.isOccupiedByMe(owner)) {
-                Move possibleMove {curPosition, newPosition, this};
-                moves.emplace_back(possibleMove);
-            }
-            break; //cannot move pass another chesspiece
-        }
-        //if the cell is not occupied
-        Move possibleMove {curPosition, newPosition, this};
-        moves.emplace_back(possibleMove);
-    }
+    addPossibleMoveByDirection(moves, curPosition, 0, -1, LX);
+
     //move up
-    for (int dy = 1; dy <= upY; ++dy) {
-        Position newPosition {curRow + dy, curCol};
-        const Cell& cell = board.getCellAtPos(newPosition);
-        if (cell.isOccupied()) {
-            if (!cell.isOccupiedByMe(owner)) {
-                Move possibleMove {curPosition, newPosition, this};
-                moves.emplace_back(possibleMove);
-            }
-            break; //cannot move pass another chesspiece
-        }
-        //if the cell is not occupied
-        Move possibleMove {curPosition, newPosition, this};
-        moves.emplace_back(possibleMove);
-    }
+    addPossibleMoveByDirection(moves, curPosition, 1, 0, upY);
+
     //move down
-    for (int dy = -1; dy >= downY; --dy) {
-        Position newPosition {curRow + dy, curCol};
-        const Cell& cell = board.getCellAtPos(newPosition);
-        if (cell.isOccupied()) {
-            if (!cell.isOccupiedByMe(owner)) {
-                Move possibleMove {curPosition, newPosition, this};
-                moves.emplace_back(possibleMove);
-            }
-            break; //cannot move pass another chesspiece
-        }
-        //if the cell is not occupied
-        Move possibleMove {curPosition, newPosition, this};
-        moves.emplace_back(possibleMove);
-    }
+    addPossibleMoveByDirection(moves, curPosition, -1, 0, downY);
+
     //diagonal moves
     int UR = std::min(RX, upY); //up-right direction
     int UL = std::min(LX, upY); //up-left direction
     int DR = std::min(RX, downY); //down-right direction
     int DL = std::min(LX, downY); //down-left direction
     //1. Up-right diagonal moves
-    for (int ur = 1; ur < UR; ur++) {
-        Position newPosition {curRow + ur, curCol + ur};
-        const Cell& cell = board.getCellAtPos(newPosition);
-        if (cell.isOccupied()) {
-            if (!cell.isOccupiedByMe(owner)) {
-                Move possibleMove {curPosition, newPosition, this};
-                moves.emplace_back(possibleMove);
-            }
-            break; //cannot move pass another chesspiece
-        }
-        //if the cell is not occupied
-        Move possibleMove {curPosition, newPosition, this};
-        moves.emplace_back(possibleMove);
-    }
+    addPossibleMoveByDirection(moves, curPosition, 1, 1, UR);
     //2. Up-left diagonal moves
-    for (int ul = 1; ul < UL; ul++) {
-        Position newPosition {curRow + ul, curCol - ul};
-        const Cell& cell = board.getCellAtPos(newPosition);
-        if (cell.isOccupied()) {
-            if (!cell.isOccupiedByMe(owner)) {
-                Move possibleMove {curPosition, newPosition, this};
-                moves.emplace_back(possibleMove);
-            }
-            break; //cannot move pass another chesspiece
-        }
-        //if the cell is not occupied
-        Move possibleMove {curPosition, newPosition, this};
-        moves.emplace_back(possibleMove);
-    }
+    addPossibleMoveByDirection(moves, curPosition, 1, -1, UL);
     //3. Down-right diagonal moves
-    for (int dr = 1; dr < DR; dr++) {
-        Position newPosition {curRow - dr, curCol + dr};
-        const Cell& cell = board.getCellAtPos(newPosition);
-        if (cell.isOccupied()) {
-            if (!cell.isOccupiedByMe(owner)) {
-                Move possibleMove {curPosition, newPosition, this};
-                moves.emplace_back(possibleMove);
-            }
-            break; //cannot move pass another chesspiece
-        }
-        //if the cell is not occupied
-        Move possibleMove {curPosition, newPosition, this};
-        moves.emplace_back(possibleMove);
-    }
+    addPossibleMoveByDirection(moves, curPosition, -1, 1, DR);
     //4. Down-left diagonal moves
-    for (int dl = 1; dl < DL; dl++) {
-        Position newPosition {curRow - dl, curCol - dl};
-        const Cell& cell = board.getCellAtPos(newPosition);
-        if (cell.isOccupied()) {
-            if (!cell.isOccupiedByMe(owner)) {
-                Move possibleMove {curPosition, newPosition, this};
-                moves.emplace_back(possibleMove);
-            }
-            break; //cannot move pass another chesspiece
-        }
-        //if the cell is not occupied
-        Move possibleMove {curPosition, newPosition, this};
-        moves.emplace_back(possibleMove);
-    }
+    addPossibleMoveByDirection(moves, curPosition, -1, -1, DL);
 
     return moves;
 }

@@ -33,5 +33,5 @@ bool TwoPlayerChessBoard::isMoveLegal(const Move& move, const Player& player) co
 }
 
 bool TwoPlayerChessBoard::isValidPos(const Position& pos) const {
-    return pos.getRow() >= 0 && pos.getRow() < dimension && pos.getCol() >= 0 && pos.getCol() < dimension;
+    return pos.getRow() >= 1 && pos.getRow() <= dimension && pos.getCol() >= 1 && pos.getCol() <= dimension;
 }

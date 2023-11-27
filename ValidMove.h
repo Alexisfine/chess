@@ -3,7 +3,7 @@
 
 
 #include "Move.h"
-
+class ChessPiece;
 class ValidMove : public Move {
     bool canCapture;
     bool canCheck;

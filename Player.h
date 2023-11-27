@@ -13,6 +13,7 @@ protected:
 public:
     Player(int playerNo, bool isComputer, ChessBoard* board, const ChessColor& color);
     virtual bool makeMove(const Move& move) = 0;
+    int getPlayerNo() const;
     virtual const ChessColor getColor() const;
 };
 
