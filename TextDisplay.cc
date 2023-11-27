@@ -4,10 +4,10 @@
 using namespace std;
 
 TextDisplay::TextDisplay(int n) : theDisplay(n), gridSize{n} { // Initialize theDisplay with size n
-    theDisplay[0] = {'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'};
-    theDisplay[n - 1] = {'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'};
-    theDisplay[1] = std::vector<char>(8, 'P');
-    theDisplay[n - 2] = std::vector<char>(8, 'p');
+    theDisplay[0] = {'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'};
+    theDisplay[n - 1] = {'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'};
+    theDisplay[1] = std::vector<char>(8, 'p');
+    theDisplay[n - 2] = std::vector<char>(8, 'P');
     for (int i = 2; i < n - 2; ++i) {
         theDisplay[i].resize(n); // Ensure each inner vector is of size n
         for (int j = 0; j < n; ++j) {
@@ -63,12 +63,23 @@ void TextDisplay::notify(Cell &c) {
 
 TextDisplay::~TextDisplay() {}
 
-std::ostream &operator<<(std::ostream &out, const TextDisplay &td) {
-    for (const auto &row : td.theDisplay) {
-        for (const auto &cell : row) {
-            out << cell;
+ostream &operator<<(ostream &out, const TextDisplay &td) {
+    int row = gridSize;
+    for (int i = 0; i < td.gridSize; ++i) { // loop through TextDisplay (a 2D vector) 
+        out << row << " "; // print the row number (starts at 8)
+        row--;
+        for (int j = 0; j < td.gridSize; ++j) {
+            out << td.theDisplay[i][j]; // prints out cell (empty cell or a chesspiece)
         }
-        out << '\n';
+        out << endl;
     }
-    return out; 
+    out << endl;
+
+    // print column letters (a,b,...,h)
+    char ch = 'a';
+    for (int i = 0; i < td.gridSize; ++i) {
+        out << ch;
+        ch++;
+    }
+    return out;
 }
