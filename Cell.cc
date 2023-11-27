@@ -6,6 +6,15 @@ ChessPiece* Cell::getChessPiece() const {
     return chessPiece;
 }
 
+Position Cell::getPosition() const {
+    Position p = {row, col};
+    return p;
+}
+
+CellState Cell::getState() const{
+    return state;
+}
+
 bool Cell::isOccupied() const {
     return state == CellState::OCCUPIED;
 }

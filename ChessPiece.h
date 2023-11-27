@@ -35,6 +35,7 @@ public:
     ChessPiece(ChessType type, ChessBoard& board, Player& owner);
     virtual ~ChessPiece();
     ChessType getType() const;
+    ChessColor getColor() const;
     Player& getOwner();
     bool isAlive() const;
     void changeAliveState();

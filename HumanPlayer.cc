@@ -4,5 +4,5 @@ HumanPlayer::HumanPlayer(int playerNo, ChessBoard *board, const ChessColor &colo
     Player{playerNo, false, board, color} {}
 
 bool HumanPlayer::makeMove(const Move& move) {
-    return board->makeMove(move, this);
+    return board->makeMove(move, *this);
 }

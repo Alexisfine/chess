@@ -16,6 +16,8 @@ class Cell {
 public:
     Cell(int row, int col);
     ChessPiece* getChessPiece() const;
+    Position getPosition() const;
+    CellState getState() const;
     bool isOccupied() const;
     bool isOccupiedByMe(const Player& player) const;
     void addChessPiece(ChessPiece& newChessPiece);
