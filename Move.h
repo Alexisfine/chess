@@ -16,7 +16,6 @@ public:
     const Position& getStart() const;
     const Position& getEnd() const;
     const ChessPiece* getChessPiece() const;
-
 };
 
 

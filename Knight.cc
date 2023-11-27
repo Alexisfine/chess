@@ -3,30 +3,28 @@
 Knight::Knight(ChessBoard& board, Player& owner) :
         ChessPiece{ChessType::KNIGHT, board, owner} {}
 
-bool Knight::isMovePossiblyValid(const Move& move) const {
-    std::vector<Move> possibleValidMoves = getAvailableMoves(move.getStart());
+bool Knight::isMovePossiblyValid(const Move& move) {
+    std::vector<ValidMove> possibleValidMoves = getAvailableMoves(move.getStart());
     for (auto validMove : possibleValidMoves) {
-        if (move == validMove) return true;
+        if (move.getStart() == validMove.getStart() && move.getEnd() == validMove.getEnd()) return true;
     }
     return false;
 }
 
-std::vector<Move> Knight::getAvailableMoves(const Position& curPosition) const {
-    std::vector<Move> moves;
-    for (int dx = -2; dx <= 2; dx++) {
-        if (dx == 0) continue;
-        for (int dy = -2; dy <= 2; dy++) {
-            if (dy == 0) continue;
-            if ((abs(dx) == 2 && abs(dy) == 1) || (abs(dx) == 1 && abs(dy) == 2)) {
-                Position newPosition {curPosition.getRow() + dx, curPosition.getCol() + dy};
-                if (!board.isValidPos(newPosition)) continue; // check if newPosition is within the grid
-                const Cell& cell = board.getCellAtPos(newPosition);
-                ChessPiece* curChessPiece = cell.getChessPiece();
-                if (&curChessPiece->getOwner() == &owner) continue; // position is occupied by player's own chess
-                Move possibleMove {curPosition, newPosition, this};
-                moves.emplace_back(possibleMove);
-            }
-        }
+std::vector<ValidMove> Knight::getAvailableMoves(const Position& curPosition) {
+    std::vector<ValidMove> moves;
+    int dir[8][2] = {{1,2}, {1,-2}, {-1,-2},{-1,2},{2,1},{2,-1},{-2,1},{-2,-1}};
+
+    for (auto pos : dir) {
+        Position newPosition {curPosition.getRow() + pos[0], curPosition.getCol() + pos[1]};
+        if (!board.isValidPos(newPosition)) continue; // check if newPosition is within the grid
+        // check if newPosition is occupied by myself
+        if (!board.isPositionEmpty(newPosition) && board.isPositionOccupiedByPlayer(newPosition, owner)) continue;
+        bool canCheck = false; //  Implement Check Later
+        bool canCapture = false;
+        if (!board.isPositionEmpty(newPosition)) canCapture = true;
+        ValidMove possibleMove {curPosition, newPosition, this, canCapture, canCheck};
+        moves.emplace_back(possibleMove);
     }
     return moves;
 }

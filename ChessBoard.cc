@@ -15,3 +15,7 @@ bool ChessBoard::isPositionEmpty(const Position& pos) const {
 bool ChessBoard::isPositionOccupiedByPlayer(const Position& pos, const Player& player) const {
     return board[pos.getRow()][pos.getCol()].isOccupiedByMe(player);
 }
+
+int ChessBoard::getDimension() const {
+    return dimension;
+}
