@@ -37,6 +37,7 @@ public:
     void setCurrentTurn(ChessColor color);
     void init();
     bool autoMove(ChessColor color);
+    void erase();
 
     friend std::ostream &operator<<(std::ostream &out, const ChessGame& game);
 

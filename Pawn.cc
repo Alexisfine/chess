@@ -58,20 +58,20 @@ std::vector<ValidMove> Pawn::getAvailableMoves(ChessBoard& board, const Position
     }
 
     bool canCheck = false;
-    if (board.isValidPos(newPosition) && board.isPositionEmpty(newPosition)) {
-        ValidMove possibleMove {curPosition, newPosition, this, false, canCheck};
-        if (check) {
-            bool willCheck = board.simulateMove(possibleMove, color);
-            if (!willCheck) {
-                moves.emplace_back(possibleMove);
-            }
-        } else moves.emplace_back(possibleMove);
-    }
+//    if (board.isValidPos(newPosition) && board.isPositionEmpty(newPosition)) {
+//        ValidMove possibleMove {curPosition, newPosition, this, false, canCheck};
+//        if (check) {
+//            bool willCheck = board.simulateMove(possibleMove, color);
+//            if (!willCheck) {
+//                moves.emplace_back(possibleMove);
+//            }
+//        } else moves.emplace_back(possibleMove);
+//    }
 
 
-    if (firstMove) {
+    if (totalMoves == 0) {
         Position newPosition2 {curPosition.getRow() + moveDy * 2, curPosition.getCol() + moveDx * 2};
-        if (board.isValidPos(newPosition) && board.isPositionEmpty(newPosition) && board.isPositionEmpty(newPosition2)) {
+        if (board.isValidPos(newPosition2) && board.isPositionEmpty(newPosition) && board.isPositionEmpty(newPosition2)) {
             ValidMove possibleMove2 {curPosition, newPosition2, this, false, canCheck};
             if (check) {
                 bool willCheck = board.simulateMove(possibleMove2, color);
@@ -105,6 +105,77 @@ std::vector<ValidMove> Pawn::getAvailableMoves(ChessBoard& board, const Position
                     moves.emplace_back(captureMove2);
                 }
             } else moves.emplace_back(captureMove2);
+        }
+    }
+
+    // add en passant logic
+    if (color == ChessColor::WHITE && curPosition.getRow() == 5) {
+        // check left cell
+        Position leftPos = {curPosition.getRow(), curPosition.getCol() - 1};
+        if (board.isValidPos(leftPos) && board.isPositionOccupiedByColor(leftPos, ChessColor::BLACK)) {
+            ChessPiece* cp = board.getCellAtPos(leftPos).getChessPiece();
+            if (cp->getType() == ChessType::PAWN && cp->getTotalMoves() == 1) {
+                ValidMove enPassantLeft {curPosition, {curPosition.getRow() + 1, curPosition.getCol() - 1},
+                                         this, true, canCheck};
+                enPassantLeft.isEnPassant();
+                if (check) {
+                    bool willCheck = board.simulateEnPassant(enPassantLeft, color);
+                    if (!willCheck) {
+                        moves.emplace_back(enPassantLeft);
+                    }
+                } else moves.emplace_back(enPassantLeft);
+            }
+        }
+
+        // check right cell
+        Position rightPos = {curPosition.getRow(), curPosition.getCol() + 1};
+        if (board.isValidPos(rightPos) && board.isPositionOccupiedByColor(rightPos, ChessColor::BLACK)) {
+            ChessPiece* cp = board.getCellAtPos(rightPos).getChessPiece();
+            if (cp->getType() == ChessType::PAWN && cp->getTotalMoves() == 1) {
+                ValidMove enPassantRight {curPosition, {curPosition.getRow() + 1, curPosition.getCol() + 1},
+                                         this, true, canCheck};
+                enPassantRight.isEnPassant();
+                if (check) {
+                    bool willCheck = board.simulateEnPassant(enPassantRight, color);
+                    if (!willCheck) {
+                        moves.emplace_back(enPassantRight);
+                    }
+                } else moves.emplace_back(enPassantRight);
+            }
+        }
+    } else if (color == ChessColor::BLACK && curPosition.getRow() == 4) {
+        // check left cell
+        Position leftPos = {curPosition.getRow(), curPosition.getCol() - 1};
+        if (board.isValidPos(leftPos) && board.isPositionOccupiedByColor(leftPos, ChessColor::WHITE)) {
+            ChessPiece* cp = board.getCellAtPos(leftPos).getChessPiece();
+            if (cp->getType() == ChessType::PAWN && cp->getTotalMoves() == 1) {
+                ValidMove enPassantLeft {curPosition, {curPosition.getRow() - 1, curPosition.getCol() - 1},
+                                         this, true, canCheck};
+                enPassantLeft.isEnPassant();
+                if (check) {
+                    bool willCheck = board.simulateEnPassant(enPassantLeft, color);
+                    if (!willCheck) {
+                        moves.emplace_back(enPassantLeft);
+                    }
+                } else moves.emplace_back(enPassantLeft);
+            }
+        }
+
+        // check right cell
+        Position rightPos = {curPosition.getRow(), curPosition.getCol() - 1};
+        if (board.isValidPos(rightPos) && board.isPositionOccupiedByColor(rightPos, ChessColor::WHITE)) {
+            ChessPiece* cp = board.getCellAtPos(rightPos).getChessPiece();
+            if (cp->getType() == ChessType::PAWN && cp->getTotalMoves() == 1) {
+                ValidMove enPassantRight {curPosition, {curPosition.getRow() - 1, curPosition.getCol() + 1},
+                                          this, true, canCheck};
+                enPassantRight.isEnPassant();
+                if (check) {
+                    bool willCheck = board.simulateEnPassant(enPassantRight, color);
+                    if (!willCheck) {
+                        moves.emplace_back(enPassantRight);
+                    }
+                } else moves.emplace_back(enPassantRight);
+            }
         }
     }
 

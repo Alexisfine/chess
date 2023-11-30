@@ -57,13 +57,21 @@ bool TwoPlayerChessBoard::makeMove(Move move, ChessColor color) {
         remove(move.getEnd());
     }
 
+    // en passant
+    if (move.getChessPiece()->getType() == ChessType::PAWN
+    && move.getEnd().getCol() != move.getStart().getCol() && !capturedChess) {
+        Position pawnCapturedPos {move.getStart().getRow(), move.getEnd().getCol()};
+        remove({move.getStart().getRow(), move.getEnd().getCol()});
+    }
+
     // move chess to new position
     board[move.getEnd().getRow()][move.getEnd().getCol()].addChessPiece(move.getChessPiece());
     remove(move.getStart());
 
+
     textDisplay.notify(board[move.getStart().getRow()][move.getStart().getCol()]);
     textDisplay.notify(board[move.getEnd().getRow()][move.getEnd().getCol()]);
-    move.getChessPiece()->setFirstMoveToFalse();
+    move.getChessPiece()->incrementTotalMoves();
     return true;
 }
 
@@ -240,3 +248,19 @@ std::vector<ValidMove> TwoPlayerChessBoard::getAllValidMoves(ChessColor color, b
     }
     return moves;
 }
+
+bool TwoPlayerChessBoard::simulateEnPassant(Move move, ChessColor color) {
+    Position start = move.getStart();
+    Position end = move.getEnd();
+    board[end.getRow()][end.getCol()].addChessPiece(move.getChessPiece());
+    board[start.getRow()][start.getCol()].removeChessPiece();
+    ChessPiece* capturedPawn = board[start.getRow()][end.getCol()].getChessPiece();
+    board[start.getRow()][end.getCol()].removeChessPiece();
+    bool check = isColorInCheck(color);
+    board[end.getRow()][end.getCol()].removeChessPiece();
+    board[start.getRow()][start.getCol()].addChessPiece(move.getChessPiece());
+    board[start.getRow()][end.getCol()].addChessPiece(capturedPawn);
+
+    return check;
+}
+

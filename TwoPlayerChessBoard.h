@@ -19,6 +19,7 @@ public:
     void remove(const Position& pos) override;
     bool verifySetup() override;
     bool simulateMove(Move move, ChessColor color) override;
+    bool simulateEnPassant(Move move, ChessColor color) override;
     std::vector<ValidMove> getAllValidMoves(ChessColor color, bool check) override;
 
 };

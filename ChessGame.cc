@@ -36,28 +36,34 @@ void ChessGame::start(PlayerType pt1, PlayerType pt2) {
 bool ChessGame::makeMove(const Position& from, const Position& to) {
     Move move {from, to, chessBoard->getCellAtPos(from).getChessPiece()};
     bool flag = chessBoard->makeMove(move, players[currentTurn]->getColor());
-    if (flag) {
-        switchTurn();
-        // Pawn promotion
-        ChessPiece* cp = chessBoard->getCellAtPos(to).getChessPiece();
-        if (cp->getType() == ChessType::PAWN) {
-            if (cp->getColor() == ChessColor::WHITE && to.getRow() == 8) {
-                chessBoard->remove(to);
-                addChess(to, ChessColor::WHITE, ChessType::ROOK);
-            } else if (cp->getColor() == ChessColor::BLACK && to.getRow() == 1) {
-                chessBoard->remove(to);
-                addChess(to, ChessColor::BLACK, ChessType::ROOK);
-            }
-        }
 
-    }
-    for (int i = 0; i < 2; i++) {
-        if (chessBoard->isColorInCheck(players[i]->getColor())) {
-            isChecked[i] = true;
-        } else {
-            isChecked[i] = false;
+    if (!flag) return flag;
+    switchTurn();
+    // Pawn promotion
+    ChessPiece* cp = chessBoard->getCellAtPos(to).getChessPiece();
+    if (cp->getType() == ChessType::PAWN) {
+        if (cp->getColor() == ChessColor::WHITE && to.getRow() == 8) {
+            chessBoard->remove(to);
+            addChess(to, ChessColor::WHITE, ChessType::ROOK);
+        } else if (cp->getColor() == ChessColor::BLACK && to.getRow() == 1) {
+            chessBoard->remove(to);
+            addChess(to, ChessColor::BLACK, ChessType::ROOK);
         }
     }
+
+
+
+    if (move.getChessPiece()->getColor() == ChessColor::WHITE) {
+        if (chessBoard->isColorInCheck(ChessColor::BLACK)) {
+            isChecked[1] = true;
+        }
+    }
+    if (move.getChessPiece()->getColor() == ChessColor::BLACK) {
+        if (chessBoard->isColorInCheck(ChessColor::WHITE)) {
+            isChecked[0] = true;
+        }
+    }
+
     for (auto player : players) {
         if (chessBoard->isColorInCheckMate(player->getColor())) {
             inGame = false;
@@ -76,10 +82,15 @@ bool ChessGame::makeMove(const Position& from, const Position& to) {
 bool ChessGame::move(const Position& from, const Position& to) {
     bool res = makeMove(from, to);
 
-    if (inGame) {
-        int possibleMovesWhite = chessBoard->getAllValidMoves(ChessColor::WHITE, true).size();
-        int possibleMovesBlack = chessBoard->getAllValidMoves(ChessColor::BLACK, true).size();
-        if (possibleMovesWhite == 0 || possibleMovesBlack == 0) {
+    if (inGame && res) {
+        int possibleMoves = 0;
+        if (chessBoard->getCellAtPos(to).isOccupiedByColor(ChessColor::WHITE)) {
+            possibleMoves = chessBoard->getAllValidMoves(ChessColor::BLACK, true).size();
+
+        } else {
+            possibleMoves = chessBoard->getAllValidMoves(ChessColor::WHITE, true).size();
+        }
+        if (possibleMoves == 0) {
             inGame = false;
             gameResult = GameResult::DRAW;
         }
@@ -152,6 +163,7 @@ GameResult ChessGame::getResult() {
 
 void ChessGame::init() {
     chessBoard->refresh();
+    setCurrentTurn(ChessColor::WHITE);
     for (auto player : players) delete player;
     players[0] = nullptr;
     players[1] = nullptr;
@@ -172,6 +184,14 @@ bool ChessGame::autoMove(ChessColor color) {
     }
     if (res) switchTurn();
     return res;
+}
+
+void ChessGame::erase() {
+    for (int row = 1; row <= 8; row++) {
+        for (int col = 1; col <= 8; col++) {
+            removeChess({row, col});
+        }
+    }
 }
 
 

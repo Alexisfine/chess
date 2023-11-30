@@ -33,7 +33,7 @@ protected:
     ChessType type;
     bool used;
     ChessColor color;
-    bool firstMove;
+    int totalMoves = 0;
 public:
     ChessPiece(ChessType type, ChessColor color);
     virtual ~ChessPiece();
@@ -41,10 +41,10 @@ public:
     ChessColor getColor() const;
     bool isUsed() const;
     void setUsed(bool setUsed);
-    void setFirstMoveToFalse();
+    void incrementTotalMoves();
     virtual bool isMovePossiblyValid(ChessBoard& board, const Move& move) = 0;
     virtual std::vector<ValidMove> getAvailableMoves(ChessBoard& board, const Position& curPosition, bool check) = 0;
-
+    int getTotalMoves() const;
 };
 
 bool operator==(const ChessPiece& a, const ChessPiece& b);

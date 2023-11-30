@@ -36,6 +36,7 @@ public:
     virtual void remove(const Position& pos) = 0;
     virtual bool verifySetup() = 0;
     virtual bool simulateMove(Move move, ChessColor color) = 0;
+    virtual bool simulateEnPassant(Move move, ChessColor color) = 0;
     virtual std::vector<ValidMove> getAllValidMoves(ChessColor color, bool check) = 0;
     friend std::ostream &operator<<(std::ostream &out, const ChessBoard& board);
 };

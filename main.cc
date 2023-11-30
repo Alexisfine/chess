@@ -137,8 +137,8 @@ int main() {
                 pt2 = (playerTwoType == "human") ? PlayerType::HUMAN : PlayerType::COMPUTER;
 
                 game.start(pt1, pt2);
-                std::cout << "Game begins" << std::endl;
-                std::cout << game << std::endl;
+                cout << "Game begins" << endl;
+                cout << game << endl;
             } else if (command == "setup") {
                 if (game.hasStarted()) {
                     cout << "Invalid Command, the game has already started" << endl;
@@ -174,18 +174,21 @@ int main() {
                         bool isValid = game.verifySetup();
                         if (isValid) {
                             setUpMode = false;
-                            std::cout << "Setup is completed" << std::endl;
+                            cout << "Setup is completed" << endl;
                         }
-                        else std::cout << "Setup is not valid" << std::endl;
+                        else cout << "Setup is not valid" << endl;
 
+                    } else if (aux == "erase") {
+                        game.erase();
+                        cout << game << endl;
                     } else {
-                        std::cout << "Invalid command" << std::endl;
+                        cout << "Invalid command" << endl;
                         cin.ignore();
                         cin.clear();
                     }
                 }
             } else {
-                std::cout << "Invalid command" << std::endl;
+                cout << "Invalid command" << endl;
                 cin.ignore();
                 cin.clear();
             }

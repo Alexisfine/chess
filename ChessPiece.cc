@@ -1,6 +1,6 @@
 #include "ChessPiece.h"
 ChessPiece::ChessPiece(ChessType type, ChessColor color) :
-    type{type}, color{color}, used{false}, firstMove{true} {}
+    type{type}, color{color}, used{false}, totalMoves{0} {}
 
 ChessPiece::~ChessPiece() {
 }
@@ -24,8 +24,12 @@ void ChessPiece::setUsed(bool setUsed) {
 }
 
 
-void ChessPiece::setFirstMoveToFalse() {
-    firstMove = false;
+void ChessPiece::incrementTotalMoves() {
+    totalMoves++;
+}
+
+int ChessPiece::getTotalMoves() const {
+    return totalMoves;
 }
 
 bool operator==(const ChessPiece& a, const ChessPiece& b) {
