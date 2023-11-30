@@ -5,11 +5,22 @@
 #include "ChessBoard.h"
 
 class TwoPlayerChessBoard : public ChessBoard {
+    void setupBoard();
 public:
     TwoPlayerChessBoard(int dimension);
-    bool makeMove(const Move& move, const Player& player) override;
-    bool isMoveLegal(const Move& move, const Player& player) const override;
+    bool makeMove(Move move, ChessColor color) override;
+    bool isMoveLegal(const Move& move, ChessColor color) override;
     bool isValidPos(const Position& pos) const override;
+    ~TwoPlayerChessBoard() override;
+    void refresh() override;
+    bool isColorInCheck(ChessColor color) override;
+    bool isColorInCheckMate(ChessColor color) override;
+    void addTo(const Position& pos, ChessColor color, ChessType chessType) override;
+    void remove(const Position& pos) override;
+    bool verifySetup() override;
+    bool simulateMove(Move move, ChessColor color) override;
+    std::vector<ValidMove> getAllValidMoves(ChessColor color, bool check) override;
+
 };
 
 

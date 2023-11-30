@@ -25,22 +25,26 @@ enum class ChessColor {
     BLUE
 };
 
+class ChessBoard;
+class Player;
+
 class ChessPiece {
 protected:
     ChessType type;
-    ChessBoard& board;
-    bool alive;
-    Player& owner;
+    bool used;
+    ChessColor color;
+    bool firstMove;
 public:
-    ChessPiece(ChessType type, ChessBoard& board, Player& owner);
+    ChessPiece(ChessType type, ChessColor color);
     virtual ~ChessPiece();
     ChessType getType() const;
     ChessColor getColor() const;
-    Player& getOwner();
-    bool isAlive() const;
-    void changeAliveState();
-    virtual bool isMovePossiblyValid(const Move& move) = 0;
-    virtual std::vector<ValidMove> getAvailableMoves(const Position& curPosition) = 0;
+    bool isUsed() const;
+    void setUsed(bool setUsed);
+    void setFirstMoveToFalse();
+    virtual bool isMovePossiblyValid(ChessBoard& board, const Move& move) = 0;
+    virtual std::vector<ValidMove> getAvailableMoves(ChessBoard& board, const Position& curPosition, bool check) = 0;
+
 };
 
 bool operator==(const ChessPiece& a, const ChessPiece& b);

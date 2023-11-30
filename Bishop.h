@@ -3,12 +3,13 @@
 #include "ChessPiece.h"
 
 class Bishop : public ChessPiece {
-    void addPossibleMoveByDirection(std::vector<ValidMove> possibleMoves,
-                                    const Position& curPosition, int dx, int dy, int maxMoves);
+    std::vector<ValidMove> addPossibleMoveByDirection(ChessBoard& board,
+                                    const Position& curPosition, int dx, int dy, int maxMoves, bool check);
     public:
-        Bishop(ChessBoard& board, Player& owner);
-        bool isMovePossiblyValid(const Move& move) override;
-        std::vector<ValidMove> getAvailableMoves(const Position& curPosition) override;
+        Bishop(ChessColor color);
+        bool isMovePossiblyValid(ChessBoard& board, const Move& move) override;
+        std::vector<ValidMove> getAvailableMoves(ChessBoard& board, const Position& curPosition, bool check) override;
+
 };
 
 

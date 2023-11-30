@@ -1,6 +1,5 @@
 #ifndef CHESS_DISPLAY_H
 #define CHESS_DISPLAY_H
-#include "ChessBoard.h"
 
 class Cell;
 enum class displayType {Text, Graphical};

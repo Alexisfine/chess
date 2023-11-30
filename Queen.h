@@ -4,12 +4,13 @@
 
 class Queen : public ChessPiece {
     bool block = false;
-    void addPossibleMoveByDirection(std::vector<ValidMove> possibleMoves,
-                                    const Position& curPosition, int dx, int dy, int maxMoves);
+    vector<ValidMove> addPossibleMoveByDirection(ChessBoard& board,
+                                    const Position& curPosition, int dx, int dy, int maxMoves, bool check);
     public:
-        Queen(ChessBoard& board, Player& owner);
-        bool isMovePossiblyValid(const Move& move) override;
-        std::vector<ValidMove> getAvailableMoves(const Position& curPosition) override;
+        Queen(ChessColor color);
+        bool isMovePossiblyValid(ChessBoard& board, const Move& move) override;
+        std::vector<ValidMove> getAvailableMoves(ChessBoard& board, const Position& curPosition, bool check) override;
+
 };
 
 

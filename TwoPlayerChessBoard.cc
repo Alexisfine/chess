@@ -1,37 +1,209 @@
 #include "TwoPlayerChessBoard.h"
+#include "Pawn.h"
+#include "Rook.h"
+#include "Knight.h"
+#include "Bishop.h"
+#include "Queen.h"
+#include "King.h"
+void TwoPlayerChessBoard::setupBoard() {}
 
-TwoPlayerChessBoard::TwoPlayerChessBoard(int dimension) : ChessBoard{dimension} {}
-bool TwoPlayerChessBoard::makeMove(const Move& move, const Player& player) {
+TwoPlayerChessBoard::TwoPlayerChessBoard(int dimension) : ChessBoard{dimension} {
+    setupBoard();
+}
+
+bool TwoPlayerChessBoard::makeMove(Move move, ChessColor color) {
     // check if move is legal
-    if (!isMoveLegal(move, player)) return false;
+    if (!isMoveLegal(move, color)) return false;
 
     // if new position contains a chess from the opponent, remove it
-    if (!isPositionEmpty(move.getEnd()) && isPositionOccupiedByPlayer(move.getEnd(),player)) return false;
+    if (!isPositionEmpty(move.getEnd()) && isPositionOccupiedByColor(move.getEnd(),color)) return false;
 
     // capture this chess
     ChessPiece* capturedChess = getCellAtPos(move.getEnd()).getChessPiece();
     if (capturedChess) {
-        removePieceAtPosition(move.getEnd());
-        capturedChess->changeAliveState();
+        remove(move.getEnd());
     }
 
     // move chess to new position
-    setPieceAtPosition(move.getEnd(), move.getChessPiece());
-    removePieceAtPosition(move.getStart());
+    board[move.getEnd().getRow()][move.getEnd().getCol()].addChessPiece(move.getChessPiece());
+    remove(move.getStart());
 
+    textDisplay.notify(board[move.getStart().getRow()][move.getStart().getCol()]);
+    textDisplay.notify(board[move.getEnd().getRow()][move.getEnd().getCol()]);
+    move.getChessPiece()->setFirstMoveToFalse();
     return true;
 }
 
-bool TwoPlayerChessBoard::isMoveLegal(const Move& move, const Player& player) const {
+bool TwoPlayerChessBoard::isMoveLegal(const Move& move, ChessColor color) {
     // check if the starting and ending position are valid
     if (!isValidPos(move.getStart()) || !isValidPos(move.getEnd())) return false;
     // check if the player has a chess at the starting position
     const Cell& cell = getCellAtPos(move.getStart());
-    if (!cell.isOccupiedByMe(player)) return false;
+    if (!cell.isOccupiedByColor(color)) return false;
     ChessPiece* chessPiece = cell.getChessPiece();
-    return chessPiece->isMovePossiblyValid(move);
+    return chessPiece->isMovePossiblyValid(*this, move);
 }
 
 bool TwoPlayerChessBoard::isValidPos(const Position& pos) const {
     return pos.getRow() >= 1 && pos.getRow() <= dimension && pos.getCol() >= 1 && pos.getCol() <= dimension;
+}
+
+TwoPlayerChessBoard::~TwoPlayerChessBoard() {
+    for (auto chess : chessPieces) delete chess;
+}
+
+
+void TwoPlayerChessBoard::refresh() {
+    setupBoard();
+}
+
+bool TwoPlayerChessBoard::isColorInCheck(ChessColor color) {
+    ChessPiece* king = nullptr;
+    int kingRow = 0;
+    int kingCol = 0;
+    // find king
+    for (int row = 1; row <= dimension; row++) {
+        for (int col = 1; col <= dimension; col++) {
+            if (board[row][col].getState() == CellState::EMPTY) continue;
+            if (board[row][col].getChessPiece()->getColor() == color &&
+                    board[row][col].getChessPiece()->getType() == ChessType::KING) {
+                king = board[row][col].getChessPiece();
+                kingRow = row;
+                kingCol = col;
+            }
+        }
+    }
+    if (!king) return false;
+
+    // Check if any opponent's piece can attack the king
+    for (int row = 1; row <= dimension; row++) {
+        for (int col = 1; col <= dimension; col++) {
+            if (board[row][col].getState() == CellState::EMPTY) continue;
+            ChessPiece* piece = board[row][col].getChessPiece();
+            if (piece && piece->getColor() != color) {
+                // Generate potential moves for this piece
+                // If any move can capture the king, return true
+                Position pos {row, col};
+                auto opponentMoves = piece->getAvailableMoves(*this, pos, false);
+                for (auto move : opponentMoves) {
+                    if (move.getEnd().getRow() == kingRow && move.getEnd().getCol() == kingCol) return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+
+bool TwoPlayerChessBoard::isColorInCheckMate(ChessColor color) {
+    if (!isColorInCheck(color)) return false;
+
+    for (int row = 1; row <= dimension; row++) {
+        for (int col = 1; col <= dimension; col++) {
+            ChessPiece* piece = board[row][col].getChessPiece();
+            if (piece && piece->getColor() == color) {
+                auto possibleMoves = piece->getAvailableMoves(*this, {row, col}, false);
+                for (const auto& move : possibleMoves) {
+                    if (!simulateMove(move, color)) {
+                        return false; // Found a move that does not result in check
+                    }
+                }
+            }
+        }
+    }
+    return true; // No move found that gets the king out of check
+}
+
+// return true if one move still leads to check
+bool TwoPlayerChessBoard::simulateMove(Move move, ChessColor color) {
+    Position start = move.getStart();
+    Position end = move.getEnd();
+    if (isPositionEmpty(end)) {
+        board[end.getRow()][end.getCol()].addChessPiece(move.getChessPiece());
+        board[start.getRow()][start.getCol()].removeChessPiece();
+        bool stillCheck = isColorInCheck(color);
+        board[end.getRow()][end.getCol()].removeChessPiece();
+        board[start.getRow()][start.getCol()].addChessPiece(move.getChessPiece());
+        return stillCheck;
+    } else {
+        ChessPiece* curChess = board[end.getRow()][end.getCol()].getChessPiece();
+        board[end.getRow()][end.getCol()].removeChessPiece();
+        board[end.getRow()][end.getCol()].addChessPiece(move.getChessPiece());
+        board[start.getRow()][start.getCol()].removeChessPiece();
+        bool stillCheck = isColorInCheck(color);
+        board[end.getRow()][end.getCol()].removeChessPiece();
+        board[end.getRow()][end.getCol()].addChessPiece(curChess);
+        board[start.getRow()][start.getCol()].addChessPiece(move.getChessPiece());
+        return stillCheck;
+    }
+}
+
+void TwoPlayerChessBoard::addTo(const Position& pos, ChessColor color, ChessType chessType) {
+    ChessPiece* newPiece;
+    switch (chessType) {
+        case ChessType::KING:
+            newPiece = new King {color};
+            break;
+        case ChessType::QUEEN:
+            newPiece = new Queen {color};
+            break;
+        case ChessType::BISHOP:
+            newPiece = new Bishop {color};
+            break;
+        case ChessType::ROOK:
+            newPiece = new Rook {color};
+            break;
+        case ChessType::KNIGHT:
+            newPiece = new Knight{color};
+            break;
+        case ChessType::PAWN:
+            newPiece = new Pawn{color};
+            break;
+    }
+    chessPieces.emplace_back(newPiece);
+    board[pos.getRow()][pos.getCol()].addChessPiece(newPiece);
+    textDisplay.notify(board[pos.getRow()][pos.getCol()]);
+}
+
+void TwoPlayerChessBoard::remove(const Position& pos) {
+    board[pos.getRow()][pos.getCol()].removeChessPiece();
+    textDisplay.notify(board[pos.getRow()][pos.getCol()]);
+}
+
+bool TwoPlayerChessBoard::verifySetup() {
+    int whiteKing = 0;
+    int blackKing = 0;
+    for (int row = 1; row <= dimension; row++) {
+        for (int col = 1; col <= dimension; col++) {
+            if (row == 1 || row == dimension) {
+                if (board[row][col].isOccupied()
+                && board[row][col].getChessPiece()->getType() == ChessType::PAWN) return false;
+            }
+            if (board[row][col].isOccupied()
+                && board[row][col].getChessPiece()->getType() == ChessType::KING) {
+                if (board[row][col].getChessPiece()->getColor() == ChessColor::WHITE) {
+                    whiteKing++;
+                } else {
+                    blackKing++;
+                }
+            }
+        }
+    }
+    if (whiteKing != 1 || blackKing != 1) return false;
+    if (isColorInCheck(ChessColor::WHITE) || isColorInCheck(ChessColor::BLACK)) return false;
+    return true;
+}
+
+
+std::vector<ValidMove> TwoPlayerChessBoard::getAllValidMoves(ChessColor color, bool check) {
+    std::vector<ValidMove> moves;
+    for (int row = 1; row <= dimension; row++) {
+        for (int col = 1; col <= dimension; col++) {
+            if (board[row][col].isOccupied() && board[row][col].isOccupiedByColor(color)) {
+                auto chessMoves = board[row][col].getChessPiece()->getAvailableMoves(*this, {row, col}, check);
+                for (auto move : chessMoves) moves.emplace_back(move);
+            }
+        }
+    }
+    return moves;
 }

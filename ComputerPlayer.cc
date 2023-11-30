@@ -9,7 +9,7 @@ ChessColor ComputerPlayer::getColor() {
     return color;
 }
 
-int randomint(int size) {
+int ComputerPlayer::randomint(int size) {
     std::random_device rd;
     std::mt19937 eng(rd());
     std::uniform_int_distribution<> distr(0, size);
@@ -25,7 +25,7 @@ bool ComputerPlayer::oneMove() {
         for (int j = 1; j <= board->getDimension(); j++) {
             const Position p {i,j};
             if (board->getCellAtPos(p).getState() == CellState::EMPTY) continue; //if the cell is empty
-            if (board->getCellAtPos(p).getChessPiece()->getOwner().getColor() == color) {
+            if (board->getCellAtPos(p).getChessPiece()->getColor() == color) {
                 allChessPiece.emplace_back(board->getCellAtPos(p));
             }
         }
@@ -37,13 +37,13 @@ bool ComputerPlayer::oneMove() {
         Cell randomCell = allChessPiece[randomIndex];
         //select a random move
         Position pos = randomCell.getPosition();
-        std::vector<ValidMove> allRandomMove = randomCell.getChessPiece()->getAvailableMoves(pos); 
+        std::vector<ValidMove> allRandomMove = randomCell.getChessPiece()->getAvailableMoves(*board, pos, true);
         if (allRandomMove.empty()) {
             allChessPiece.erase(allChessPiece.begin() + randomIndex); //remove this chesspiece that has no valid moves
             continue; //reselect a cell
         }
         Move randomMove = allRandomMove[randomint(allRandomMove.size() - 1)];
-        board->makeMove(randomMove, *this);
+        board->makeMove(randomMove, color);
         return true;
     }
 }
