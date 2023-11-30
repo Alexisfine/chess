@@ -49,7 +49,13 @@ bool Pawn::isMovePossiblyValid(ChessBoard& board, const Move& move) {
 std::vector<ValidMove> Pawn::getAvailableMoves(ChessBoard& board, const Position& curPosition, bool check) {
     std::vector<ValidMove> moves;
     Position newPosition {curPosition.getRow() + moveDy, curPosition.getCol() + moveDx};
-    if (!board.isPositionEmpty(newPosition)) return moves;
+    if (board.isPositionEmpty(newPosition)) {
+        ValidMove possibleMove {curPosition, newPosition, this, false, false};
+        if (check) {
+            bool willCheck = board.simulateMove(possibleMove, color);
+            if (!willCheck) moves.emplace_back(possibleMove);
+        } else moves.emplace_back(possibleMove);
+    }
 
     bool canCheck = false;
     if (board.isValidPos(newPosition) && board.isPositionEmpty(newPosition)) {

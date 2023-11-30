@@ -36,7 +36,21 @@ void ChessGame::start(PlayerType pt1, PlayerType pt2) {
 bool ChessGame::makeMove(const Position& from, const Position& to) {
     Move move {from, to, chessBoard->getCellAtPos(from).getChessPiece()};
     bool flag = chessBoard->makeMove(move, players[currentTurn]->getColor());
-    if (flag) switchTurn();
+    if (flag) {
+        switchTurn();
+        // Pawn promotion
+        ChessPiece* cp = chessBoard->getCellAtPos(to).getChessPiece();
+        if (cp->getType() == ChessType::PAWN) {
+            if (cp->getColor() == ChessColor::WHITE && to.getRow() == 8) {
+                chessBoard->remove(to);
+                addChess(to, ChessColor::WHITE, ChessType::ROOK);
+            } else if (cp->getColor() == ChessColor::BLACK && to.getRow() == 1) {
+                chessBoard->remove(to);
+                addChess(to, ChessColor::BLACK, ChessType::ROOK);
+            }
+        }
+
+    }
     for (int i = 0; i < 2; i++) {
         if (chessBoard->isColorInCheck(players[i]->getColor())) {
             isChecked[i] = true;
@@ -61,6 +75,7 @@ bool ChessGame::makeMove(const Position& from, const Position& to) {
 
 bool ChessGame::move(const Position& from, const Position& to) {
     bool res = makeMove(from, to);
+
     if (inGame) {
         int possibleMovesWhite = chessBoard->getAllValidMoves(ChessColor::WHITE, true).size();
         int possibleMovesBlack = chessBoard->getAllValidMoves(ChessColor::BLACK, true).size();
