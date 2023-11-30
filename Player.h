@@ -11,18 +11,23 @@ class ChessPiece;
 class ChessBoard;
 class Move;
 
+enum class PlayerType {
+    COMPUTER,
+    HUMAN
+};
+
 class Player {
 protected:
     int playerNo;
-    bool isComputer;
+    PlayerType playerType;
     const ChessColor color;
     ChessBoard* board;
 public:
-    Player(int playerNo, bool isComputer, ChessBoard* board, const ChessColor color);
+    Player(int playerNo, PlayerType playerType, ChessBoard* board, const ChessColor color);
     virtual ~Player();
-    virtual bool makeMove(const Move& move) = 0;
     int getPlayerNo() const;
     virtual const ChessColor getColor() const;
+    PlayerType getPlayerType();
 };
 
 

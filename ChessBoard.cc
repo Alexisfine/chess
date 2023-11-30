@@ -11,9 +11,6 @@ board(dimension + 1, std::vector<Cell>(dimension + 1)), textDisplay{dimension}{
 const Cell& ChessBoard::getCellAtPos(const Position& pos) const {
     return board[pos.getRow()][pos.getCol()];
 }
-void ChessBoard::setPieceAtPosition(const Position& pos, ChessPiece& piece) {
-    board[pos.getRow()][pos.getCol()].addChessPiece(&piece);
-}
 
 void ChessBoard::remove(const Position& pos) {
     board[pos.getRow()][pos.getCol()].removeChessPiece();

@@ -63,111 +63,133 @@ ChessColor strToColor(string str) {
 
 int main() {
     string command, aux;
-    ChessGame* game;
+    ChessGame game {8};
+    PlayerType pt1;
+    PlayerType pt2;
 
     while (cin >> command) {
-        if (command == "game") {
-            int playerOneType;
-            int playerTwoType;
-            cin >> playerOneType;
-            cin >> playerTwoType;
-            // for now, just use two human players
-            game = new ChessGame {8};
-        } else if (command == "resign") {
-            ChessColor color = game->getCurrentColor();
-            game->resign();
-            if (color == ChessColor::WHITE) {
-                cout << "Black wins!" << endl;
-            } else {
-                cout << "White wins!" << endl;
-            }
-        } else if (command == "move") {
-            string from;
-            string to;
-            cin >> from;
-            cin >> to;
-            Position fromPos = strToPos(from);
-            Position toPos = strToPos(to);
-            bool success = game->move(fromPos, toPos);
-            if (!success) {
-                cout << "Invalid Move" << endl;
-                continue;
-            }
-            cout << *game << endl;
-            auto isCheckMate = game->getIsChecked();
-            for (const auto& [player, check] : isCheckMate) {
-                if (check) {
-                    if (player->getColor() == ChessColor::WHITE) {
-                        cout << "White is in check." << endl;
+        if (game.hasStarted()) {
+             if (command == "resign") {
+                ChessColor color = game.getCurrentColor();
+                game.resign();
+                game.init();
+                if (color == ChessColor::WHITE) {
+                    cout << "Black wins!" << endl;
+                } else {
+                    cout << "White wins!" << endl;
+                }
+             } else if (command == "move") {
+                 if (game.getCurrentColor() == ChessColor::WHITE) {
+                     if (pt1 == PlayerType::COMPUTER) {
+                         game.autoMove(game.getCurrentColor());
+                         cout << game << endl;
+                         continue;
+                     }
+                 } else if (game.getCurrentColor() == ChessColor::BLACK) {
+                     if (pt2 == PlayerType::COMPUTER) {
+                         game.autoMove(game.getCurrentColor());
+                         cout << game << endl;
+                         continue;
+                     }
+                 }
+                 string from;
+                 string to;
+                 cin >> from;
+                 cin >> to;
+                 Position fromPos = strToPos(from);
+                 Position toPos = strToPos(to);
+                 bool success = game.move(fromPos, toPos);
+                 if (!success) {
+                     cout << "Invalid Move" << endl;
+                     continue;
+                 }
+                 cout << game << endl;
+                 auto isCheckMate = game.getIsChecked();
+                 for (int i = 0; i < 2; i++) {
+                     if (*(isCheckMate + i)) {
+                         if (i == 0) {
+                             cout << "White is in check." << endl;
+                         } else {
+                            cout << "Black is in check." << endl;
+                         }
+                     }
+                 }
+
+                // game has ended
+                if (!game.hasStarted()) {
+                    if (game.getResult() == GameResult::WHITE_WON) {
+                        cout << "Checkmate! White wins!" << endl;
+                    } else if (game.getResult() == GameResult::BLACK_WON) {
+                        cout << "Checkmate! Black wins!" << endl;
                     } else {
-                        cout << "Black is in check." << endl;
+                        cout << "Stalemate" << endl;
                     }
-                }
-            }
-
-            // game has ended
-            if (!game->hasStarted()) {
-                if (game->getResult() == GameResult::WHITE_WON) {
-                    cout << "Checkmate! White wins!" << endl;
-                } else if (game->getResult() == GameResult::BLACK_WON) {
-                    cout << "Checkmate! Black wins!" << endl;
-                } else {
-                    cout << "Stalemate" << endl;
-                }
-                game->displayScore();
-            }
-
-        } else if (command == "setup") {
-            if (game->hasStarted()) {
-                cout << "Invalid Command, the game has already started" << endl;
-                cin.ignore();
-                cin.clear();
-                continue;
-            }
-            bool setUpMode = true;
-            while (setUpMode) {
-                cin >> aux;
-                if (aux == "+") {
-                    string type;
-                    string position;
-                    cin >> type;
-                    cin >> position;
-                    ChessType chessType = strToType(type);
-                    Position pos = strToPos(position);
-                    game->addChess(pos, strToColor(type), chessType);
-                    cout << *game << endl;
-                } else if (aux == "-") {
-                    string position;
-                    cin >> position;
-                    game->removeChess(strToPos(position));
-                    cout << *game << endl;
-                } else if (aux == "=") {
-                    string color;
-                    cin >> color;
-                    ChessColor c;
-                    if (color == "white") c = ChessColor::WHITE;
-                    else c = ChessColor::BLACK;
-                    game->setCurrentTurn(c);
-                } else if (aux == "done") {
-                    bool isValid = game->verifySetup();
-                    if (isValid) setUpMode = false;
-                    else std::cout << "Setup is not valid" << std::endl;
-                    if (isValid) {
-                        game->start();
-                        std::cout << "Game begins" << std::endl;
-                    }
-                } else {
-                    std::cout << "Invalid command" << std::endl;
-                    cin.ignore();
-                    cin.clear();
+                    game.init(); // reinitialized next game
                 }
             }
         } else {
-            std::cout << "Invalid command" << std::endl;
-            cin.ignore();
-            cin.clear();
+            if (command == "game") {
+                string playerOneType;
+                string playerTwoType;
+                cin >> playerOneType;
+                cin >> playerTwoType;
+                pt1 = (playerOneType == "human") ? PlayerType::HUMAN : PlayerType::COMPUTER;
+                pt2 = (playerTwoType == "human") ? PlayerType::HUMAN : PlayerType::COMPUTER;
+
+                game.start(pt1, pt2);
+                std::cout << "Game begins" << std::endl;
+                std::cout << game << std::endl;
+            } else if (command == "setup") {
+                if (game.hasStarted()) {
+                    cout << "Invalid Command, the game has already started" << endl;
+                    cin.ignore();
+                    cin.clear();
+                    continue;
+                }
+                bool setUpMode = true;
+                while (setUpMode) {
+                    cin >> aux;
+                    if (aux == "+") {
+                        string type;
+                        string position;
+                        cin >> type;
+                        cin >> position;
+                        ChessType chessType = strToType(type);
+                        Position pos = strToPos(position);
+                        game.addChess(pos, strToColor(type), chessType);
+                        cout << game << endl;
+                    } else if (aux == "-") {
+                        string position;
+                        cin >> position;
+                        game.removeChess(strToPos(position));
+                        cout << game << endl;
+                    } else if (aux == "=") {
+                        string color;
+                        cin >> color;
+                        ChessColor c;
+                        if (color == "white") c = ChessColor::WHITE;
+                        else c = ChessColor::BLACK;
+                        game.setCurrentTurn(c);
+                    } else if (aux == "done") {
+                        bool isValid = game.verifySetup();
+                        if (isValid) {
+                            setUpMode = false;
+                            std::cout << "Setup is completed" << std::endl;
+                        }
+                        else std::cout << "Setup is not valid" << std::endl;
+
+                    } else {
+                        std::cout << "Invalid command" << std::endl;
+                        cin.ignore();
+                        cin.clear();
+                    }
+                }
+            } else {
+                std::cout << "Invalid command" << std::endl;
+                cin.ignore();
+                cin.clear();
+            }
         }
     }
-
-    delete game;
+    game.displayScore();
 }

@@ -1,38 +1,47 @@
 #include "ChessGame.h"
 #include "TwoPlayerChessBoard.h"
 #include "HumanPlayer.h"
+#include "ComputerPlayer.h"
 #include <iostream>
 
-ChessGame::ChessGame(int dimension) : chessBoard{new TwoPlayerChessBoard{dimension}}, score(2, 0){
-    Player* p1 = new HumanPlayer{1, chessBoard, ChessColor::WHITE};
-    players.emplace_back(p1);
-    Player* p2 = new HumanPlayer{2, chessBoard, ChessColor::BLACK};
-    players.emplace_back(p2);
-    isChecked[players[0]] = false;
-    isChecked[players[1]] = false;
-}
+ChessGame::ChessGame(int dimension) : chessBoard{new TwoPlayerChessBoard{dimension}} {}
 
 ChessGame::~ChessGame() {
     for (auto player : players) delete player;
     delete chessBoard;
 }
 
-void ChessGame::start() {
+void ChessGame::start(PlayerType pt1, PlayerType pt2) {
+    delete players[0];
+    delete players[1];
+
+    if (pt1 == PlayerType::HUMAN) {
+        players[0] = new HumanPlayer{1, chessBoard, ChessColor::WHITE};
+    } else {
+        players[0] = new ComputerPlayer{1, chessBoard, ChessColor::WHITE};
+    }
+
+    if (pt2 == PlayerType::HUMAN) {
+        players[1] = new HumanPlayer{1, chessBoard, ChessColor::BLACK};
+    } else {
+        players[1] = new ComputerPlayer{1, chessBoard, ChessColor::BLACK};
+    }
+
     inGame = true;
     gameResult = GameResult::IN_PROGRESS;
-    isChecked[players[0]] = false;
-    isChecked[players[1]] = false;
+    isChecked[0] = false;
+    isChecked[1] = false;
 }
 
 bool ChessGame::makeMove(const Position& from, const Position& to) {
     Move move {from, to, chessBoard->getCellAtPos(from).getChessPiece()};
     bool flag = chessBoard->makeMove(move, players[currentTurn]->getColor());
     if (flag) switchTurn();
-    for (auto player : players) {
-        if (chessBoard->isColorInCheck(player->getColor())) {
-            isChecked[player] = true;
+    for (int i = 0; i < 2; i++) {
+        if (chessBoard->isColorInCheck(players[i]->getColor())) {
+            isChecked[i] = true;
         } else {
-            isChecked[player] = false;
+            isChecked[i] = false;
         }
     }
     for (auto player : players) {
@@ -85,11 +94,11 @@ std::ostream &operator<<(std::ostream &out, const ChessGame& game) {
 }
 
 void ChessGame::switchTurn() {
-    if (currentTurn < players.size() - 1) currentTurn++;
+    if (currentTurn < 1) currentTurn++;
     else currentTurn = 0;
 }
 
-map<Player*, bool> ChessGame::getIsChecked() {
+bool* ChessGame::getIsChecked() {
     return isChecked;
 }
 
@@ -124,6 +133,30 @@ void ChessGame::displayScore() {
 
 GameResult ChessGame::getResult() {
     return gameResult;
+}
+
+void ChessGame::init() {
+    chessBoard->refresh();
+    for (auto player : players) delete player;
+    players[0] = nullptr;
+    players[1] = nullptr;
+}
+
+bool ChessGame::autoMove(ChessColor color) {
+    bool res = true;
+    if (color == ChessColor::WHITE) {
+        if (players[0]->getPlayerType() != PlayerType::COMPUTER) return false;
+        ComputerPlayer* player = dynamic_cast<ComputerPlayer*>(players[0]);
+        ValidMove move = player->getMove();
+        res = chessBoard->makeMove(move, color);
+    } else {
+        if (players[1]->getPlayerType() != PlayerType::COMPUTER) return false;
+        ComputerPlayer* player = dynamic_cast<ComputerPlayer*>(players[1]);
+        ValidMove move = player->getMove();
+        res = chessBoard->makeMove(move, color);
+    }
+    if (res) switchTurn();
+    return res;
 }
 
 

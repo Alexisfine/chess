@@ -5,7 +5,40 @@
 #include "Bishop.h"
 #include "Queen.h"
 #include "King.h"
-void TwoPlayerChessBoard::setupBoard() {}
+void TwoPlayerChessBoard::setupBoard() {
+    for (int row = 1; row <= dimension; row++) {
+        for (int col = 1; col <= dimension; col++) {
+            remove({row, col});
+        }
+    }
+    for (auto chess : chessPieces) delete chess;
+    chessPieces.clear();
+
+    for (int col = 1; col <= dimension; col++) {
+        addTo({2, col}, ChessColor::WHITE, ChessType::PAWN);
+    }
+    for (int col = 1; col <= dimension; col++) {
+        addTo({7, col}, ChessColor::BLACK, ChessType::PAWN);
+    }
+    addTo({1, 1}, ChessColor::WHITE, ChessType::ROOK);
+    addTo({1, 2}, ChessColor::WHITE, ChessType::KNIGHT);
+    addTo({1, 3}, ChessColor::WHITE, ChessType::BISHOP);
+    addTo({1, 4}, ChessColor::WHITE, ChessType::QUEEN);
+    addTo({1, 5}, ChessColor::WHITE, ChessType::KING);
+    addTo({1, 6}, ChessColor::WHITE, ChessType::BISHOP);
+    addTo({1, 7}, ChessColor::WHITE, ChessType::KNIGHT);
+    addTo({1, 8}, ChessColor::WHITE, ChessType::ROOK);
+
+    addTo({8, 1}, ChessColor::BLACK, ChessType::ROOK);
+    addTo({8, 2}, ChessColor::BLACK, ChessType::KNIGHT);
+    addTo({8, 3}, ChessColor::BLACK, ChessType::BISHOP);
+    addTo({8, 4}, ChessColor::BLACK, ChessType::QUEEN);
+    addTo({8, 5}, ChessColor::BLACK, ChessType::KING);
+    addTo({8, 6}, ChessColor::BLACK, ChessType::BISHOP);
+    addTo({8, 7}, ChessColor::BLACK, ChessType::KNIGHT);
+    addTo({8, 8}, ChessColor::BLACK, ChessType::ROOK);
+
+}
 
 TwoPlayerChessBoard::TwoPlayerChessBoard(int dimension) : ChessBoard{dimension} {
     setupBoard();

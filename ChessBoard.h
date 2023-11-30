@@ -28,7 +28,6 @@ public:
     bool isPositionEmpty(const Position& pos) const;
     bool isPositionOccupiedByColor(const Position& pos, const ChessColor& color) const;
     const Cell& getCellAtPos(const Position& pos) const;
-    void setPieceAtPosition(const Position& pos, ChessPiece& piece);
     int getDimension() const;
     virtual void refresh() = 0;
     virtual bool isColorInCheck(ChessColor color) = 0;

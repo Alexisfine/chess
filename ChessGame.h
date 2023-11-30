@@ -14,9 +14,9 @@ enum class GameResult {
 
 class ChessGame {
     ChessBoard* chessBoard;
-    vector<Player*> players;
-    vector<int> score;
-    map<Player*, bool> isChecked;
+    Player* players[2] = {nullptr, nullptr};
+    int score[2] = {0, 0};
+    bool isChecked[2] = {false, false};
     int currentTurn = 0;
     bool inGame = false;
     GameResult gameResult;
@@ -26,15 +26,17 @@ class ChessGame {
 public:
     ChessGame(int dimension);
     ~ChessGame();
-    void start();
+    void start(PlayerType pt1, PlayerType pt2);
     void resign();
     bool hasStarted();
     void addChess(const Position& pos, ChessColor color, ChessType chessType);
     bool move(const Position& from, const Position& to);
     ChessColor getCurrentColor();
-    map<Player*, bool> getIsChecked();
+    bool* getIsChecked();
     void removeChess(const Position& pos);
     void setCurrentTurn(ChessColor color);
+    void init();
+    bool autoMove(ChessColor color);
 
     friend std::ostream &operator<<(std::ostream &out, const ChessGame& game);
 
