@@ -79,6 +79,8 @@ MoveResult ChessGame::move(const Position& from, const Position& to) {
         if (possibleMoves == 0) {
             inGame = false;
             gameResult = GameResult::DRAW;
+            score[0] += 0.5;
+            score[1] += 0.5;
         }
     }
     return res;
@@ -192,8 +194,28 @@ void ChessGame::promotePawn(ChessType chessType, const Position& pos) {
     removeChess(pos);
     if (currentTurn == 0) {
         addChess(pos, ChessColor::BLACK, chessType);
+        if (chessBoard->isColorInCheck(ChessColor::WHITE)) {
+            isChecked[0] = true;
+        }
     } else {
         addChess(pos, ChessColor::WHITE, chessType);
+        if (chessBoard->isColorInCheck(ChessColor::BLACK)) {
+            isChecked[1] = true;
+        }
+    }
+
+
+    for (auto player : players) {
+        if (chessBoard->isColorInCheckMate(player->getColor())) {
+            inGame = false;
+            if (currentTurn == 0) {
+                score[1]++;
+                gameResult = GameResult::BLACK_WON;
+            } else {
+                score[0]++;
+                gameResult = GameResult::WHITE_WON;
+            }
+        }
     }
 }
 

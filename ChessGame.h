@@ -17,7 +17,7 @@ enum class GameResult {
 class ChessGame {
     ChessBoard* chessBoard;
     Player* players[2] = {nullptr, nullptr};
-    int score[2] = {0, 0};
+    double score[2] = {0, 0};
     bool isChecked[2] = {false, false};
     int currentTurn = 0;
     bool inGame = false;
