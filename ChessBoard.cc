@@ -34,3 +34,13 @@ std::ostream &operator<<(std::ostream &out, const ChessBoard& board) {
     out << board.textDisplay;
     return out;
 }
+
+void ChessBoard::completeSetup() {
+    for (int row = 1; row <= dimension; row++) {
+        for (int col = 1; col <= dimension; col++) {
+            if (board[row][col].isOccupied()) {
+                board[row][col].getChessPiece()->incrementTotalMoves();
+            }
+        }
+    }
+}

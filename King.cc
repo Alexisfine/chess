@@ -3,12 +3,12 @@
 King::King(ChessColor color) :
         ChessPiece{ChessType::KING, color} {}
 
-bool King::isMovePossiblyValid(ChessBoard& board, const Move& move) {
+MoveResult King::isMovePossiblyValid(ChessBoard& board, const Move& move) {
     std::vector<ValidMove> possibleValidMoves = getAvailableMoves(board, move.getStart(), true);
     for (auto validMove : possibleValidMoves) {
-        if (move.getStart() == validMove.getStart() && move.getEnd() == validMove.getEnd()) return true;
+        if (move.getStart() == validMove.getStart() && move.getEnd() == validMove.getEnd()) return {true, false};
     }
-    return false;
+    return {false, false};
 }
 std::vector<ValidMove> King::getAvailableMoves(ChessBoard& board, const Position& curPosition, bool check) {
     int possibleMoves[8][2] = {{1,0},{-1,0},{0,1},{0,-1},{-1,-1},{-1,1},{1,-1},{1,1}};

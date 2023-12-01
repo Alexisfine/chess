@@ -12,6 +12,8 @@ enum class GameResult {
     DRAW
 };
 
+
+
 class ChessGame {
     ChessBoard* chessBoard;
     Player* players[2] = {nullptr, nullptr};
@@ -20,7 +22,7 @@ class ChessGame {
     int currentTurn = 0;
     bool inGame = false;
     GameResult gameResult;
-    bool makeMove(const Position& from, const Position& to);
+    MoveResult makeMove(const Position& from, const Position& to);
     void switchTurn();
 
 public:
@@ -30,7 +32,7 @@ public:
     void resign();
     bool hasStarted();
     void addChess(const Position& pos, ChessColor color, ChessType chessType);
-    bool move(const Position& from, const Position& to);
+    MoveResult move(const Position& from, const Position& to);
     ChessColor getCurrentColor();
     bool* getIsChecked();
     void removeChess(const Position& pos);
@@ -38,6 +40,8 @@ public:
     void init();
     bool autoMove(ChessColor color);
     void erase();
+    void promotePawn(ChessType chessType, const Position& pos);
+    void completeSetup();
 
     friend std::ostream &operator<<(std::ostream &out, const ChessGame& game);
 

@@ -3,12 +3,12 @@
 Queen::Queen(ChessColor color):
     ChessPiece(ChessType::QUEEN, color) {}
 
-bool Queen::isMovePossiblyValid(ChessBoard& board, const Move& move)  {
+MoveResult Queen::isMovePossiblyValid(ChessBoard& board, const Move& move)  {
     std::vector<ValidMove> possibleValidMoves = getAvailableMoves(board, move.getStart(), true);
     for (auto validMove : possibleValidMoves) {
-        if (move.getStart() == validMove.getStart() && move.getEnd() == validMove.getEnd()) return true;
+        if (move.getStart() == validMove.getStart() && move.getEnd() == validMove.getEnd()) return {true, false};
     }
-    return false;
+    return {false, false};
 }
 
 vector<ValidMove> Queen::addPossibleMoveByDirection(ChessBoard& board,

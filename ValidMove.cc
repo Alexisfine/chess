@@ -1,7 +1,7 @@
 #include "ValidMove.h"
 
 ValidMove::ValidMove(Position start, Position end, ChessPiece* chessPiece, bool canCapture, bool canCheck)
-: Move{start, end, chessPiece}, canCapture{canCapture}, canCheck{canCapture}, enPassant{false} {}
+: Move{start, end, chessPiece}, canCapture{canCapture}, canCheck{canCapture}, enPassant{false}, promotion{false} {}
 
 bool ValidMove::operator<(const ValidMove& other) const {
     if (canCheck && !other.canCheck) return false;
@@ -21,4 +21,16 @@ Position ValidMove::getEnd() const {
 
 void ValidMove::isEnPassant() {
     enPassant = true;
+}
+
+bool ValidMove::getEnPassant() const {
+    return enPassant;
+}
+
+bool ValidMove::getPromotion() {
+    return promotion;
+}
+
+void ValidMove::setPromotion(bool p) {
+    promotion = p;
 }

@@ -12,6 +12,9 @@ class ChessPiece;
 enum class ChessColor;
 enum class ChessType;
 class ValidMove;
+struct MoveResult;
+
+
 
 class ChessBoard {
 protected:
@@ -22,8 +25,8 @@ protected:
 public:
     ChessBoard(int dimension);
     virtual ~ChessBoard();
-    virtual bool makeMove(Move move, ChessColor color) = 0;
-    virtual bool isMoveLegal(const Move& move, ChessColor color) = 0;
+    virtual MoveResult makeMove(Move move, ChessColor color) = 0;
+    virtual MoveResult isMoveLegal(const Move& move, ChessColor color) = 0;
     virtual bool isValidPos(const Position& pos) const = 0;
     bool isPositionEmpty(const Position& pos) const;
     bool isPositionOccupiedByColor(const Position& pos, const ChessColor& color) const;
@@ -38,6 +41,7 @@ public:
     virtual bool simulateMove(Move move, ChessColor color) = 0;
     virtual bool simulateEnPassant(Move move, ChessColor color) = 0;
     virtual std::vector<ValidMove> getAllValidMoves(ChessColor color, bool check) = 0;
+    void completeSetup();
     friend std::ostream &operator<<(std::ostream &out, const ChessBoard& board);
 };
 

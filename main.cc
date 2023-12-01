@@ -98,8 +98,43 @@ int main() {
                  cin >> to;
                  Position fromPos = strToPos(from);
                  Position toPos = strToPos(to);
-                 bool success = game.move(fromPos, toPos);
-                 if (!success) {
+
+                 MoveResult result = game.move(fromPos, toPos);
+                 if (result.pawnPromotion) {
+                     char promotedChess;
+                     cin >> promotedChess;
+                     ChessType newChess;
+                     switch (promotedChess) {
+                         case 'Q':
+                             newChess = ChessType::QUEEN;
+                             break;
+                         case 'q':
+                             newChess = ChessType::QUEEN;
+                             break;
+                         case 'R':
+                             newChess = ChessType::ROOK;
+                             break;
+                         case 'r':
+                             newChess = ChessType::ROOK;
+                             break;
+                         case 'B':
+                             newChess = ChessType::BISHOP;
+                             break;
+                         case 'b':
+                             newChess = ChessType::BISHOP;
+                             break;
+                         case 'N':
+                             newChess = ChessType::KNIGHT;
+                             break;
+                         case 'n':
+                             newChess = ChessType::KNIGHT;
+                         default:
+                             newChess = ChessType::QUEEN;
+                     }
+                     game.promotePawn(newChess, toPos);
+                 }
+
+                 if (!result.success) {
                      cout << "Invalid Move" << endl;
                      continue;
                  }
@@ -126,6 +161,8 @@ int main() {
                     }
                     game.init(); // reinitialized next game
                 }
+                cin.ignore();
+                cin.clear();
             }
         } else {
             if (command == "game") {
@@ -175,6 +212,7 @@ int main() {
                         if (isValid) {
                             setUpMode = false;
                             cout << "Setup is completed" << endl;
+                            game.completeSetup();
                         }
                         else cout << "Setup is not valid" << endl;
 

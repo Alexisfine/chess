@@ -24,6 +24,11 @@ enum class ChessColor {
     RED,
     BLUE
 };
+struct MoveResult {
+    bool success;
+    bool pawnPromotion;
+};
+
 
 class ChessBoard;
 class Player;
@@ -42,7 +47,7 @@ public:
     bool isUsed() const;
     void setUsed(bool setUsed);
     void incrementTotalMoves();
-    virtual bool isMovePossiblyValid(ChessBoard& board, const Move& move) = 0;
+    virtual MoveResult isMovePossiblyValid(ChessBoard& board, const Move& move) = 0;
     virtual std::vector<ValidMove> getAvailableMoves(ChessBoard& board, const Position& curPosition, bool check) = 0;
     int getTotalMoves() const;
 };

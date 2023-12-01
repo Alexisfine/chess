@@ -8,8 +8,8 @@ class TwoPlayerChessBoard : public ChessBoard {
     void setupBoard();
 public:
     TwoPlayerChessBoard(int dimension);
-    bool makeMove(Move move, ChessColor color) override;
-    bool isMoveLegal(const Move& move, ChessColor color) override;
+    MoveResult makeMove(Move move, ChessColor color) override;
+    MoveResult isMoveLegal(const Move& move, ChessColor color) override;
     bool isValidPos(const Position& pos) const override;
     ~TwoPlayerChessBoard() override;
     void refresh() override;

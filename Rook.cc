@@ -3,12 +3,12 @@
 Rook::Rook(ChessColor color) :
         ChessPiece{ChessType::ROOK, color} {}
 
-bool Rook::isMovePossiblyValid(ChessBoard& board, const Move& move)  {
+MoveResult Rook::isMovePossiblyValid(ChessBoard& board, const Move& move)  {
     std::vector<ValidMove> possibleValidMoves = getAvailableMoves(board, move.getStart(), true);
     for (auto validMove : possibleValidMoves) {
-        if (move.getStart() == validMove.getStart() && move.getEnd() == validMove.getEnd()) return true;
+        if (move.getStart() == validMove.getStart() && move.getEnd() == validMove.getEnd()) return {true, false};
     }
-    return false;
+    return {false, false};
 }
 
 vector<ValidMove> Rook::addPossibleMoveByDirection(ChessBoard& board,

@@ -3,12 +3,12 @@
 Bishop::Bishop(ChessColor color):
     ChessPiece(ChessType::BISHOP, color) {}
 
-bool Bishop::isMovePossiblyValid(ChessBoard& board, const Move& move) {
+MoveResult Bishop::isMovePossiblyValid(ChessBoard& board, const Move& move) {
     std::vector<ValidMove> possibleValidMoves = getAvailableMoves(board, move.getStart(), false);
     for (auto validMove : possibleValidMoves) {
-        if (move.getStart() == validMove.getStart() && move.getEnd() == validMove.getEnd()) return true;
+        if (move.getStart() == validMove.getStart() && move.getEnd() == validMove.getEnd()) return {true, false};
     }
-    return false;
+    return {false, false};
 }
 
 std::vector<ValidMove> Bishop::addPossibleMoveByDirection(ChessBoard& board,

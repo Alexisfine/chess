@@ -44,12 +44,13 @@ TwoPlayerChessBoard::TwoPlayerChessBoard(int dimension) : ChessBoard{dimension} 
     setupBoard();
 }
 
-bool TwoPlayerChessBoard::makeMove(Move move, ChessColor color) {
+MoveResult TwoPlayerChessBoard::makeMove(Move move, ChessColor color) {
     // check if move is legal
-    if (!isMoveLegal(move, color)) return false;
+    MoveResult res = isMoveLegal(move, color);
+    if (!res.success) return res;
 
     // if new position contains a chess from the opponent, remove it
-    if (!isPositionEmpty(move.getEnd()) && isPositionOccupiedByColor(move.getEnd(),color)) return false;
+    if (!isPositionEmpty(move.getEnd()) && isPositionOccupiedByColor(move.getEnd(),color)) return {false, false};
 
     // capture this chess
     ChessPiece* capturedChess = getCellAtPos(move.getEnd()).getChessPiece();
@@ -58,9 +59,28 @@ bool TwoPlayerChessBoard::makeMove(Move move, ChessColor color) {
     }
 
     // en passant
+    // update pawn's state
+    if (move.getChessPiece()->getType() == ChessType::PAWN) {
+        if ((move.getStart().getRow() == 7 && move.getEnd().getRow() == 5)
+        || (move.getStart().getRow() == 2 && move.getEnd().getRow() == 4)) {
+            Pawn* pawn = dynamic_cast<Pawn*>(move.getChessPiece());
+            pawn->setJustMadeDoubleStep(true);
+        }
+    }
+    for (int row = 1; row <= dimension; row++) {
+        for (int col = 1; col <= dimension; col++) {
+            if (!isPositionEmpty({row, col})) {
+                auto cur = board[row][col].getChessPiece();
+                if (cur != move.getChessPiece() && cur->getType() == ChessType::PAWN) {
+                    Pawn* curPawn = dynamic_cast<Pawn*>(cur);
+                    curPawn->setJustMadeDoubleStep(false);
+                }
+            }
+        }
+    }
+
     if (move.getChessPiece()->getType() == ChessType::PAWN
     && move.getEnd().getCol() != move.getStart().getCol() && !capturedChess) {
-        Position pawnCapturedPos {move.getStart().getRow(), move.getEnd().getCol()};
         remove({move.getStart().getRow(), move.getEnd().getCol()});
     }
 
@@ -72,15 +92,15 @@ bool TwoPlayerChessBoard::makeMove(Move move, ChessColor color) {
     textDisplay.notify(board[move.getStart().getRow()][move.getStart().getCol()]);
     textDisplay.notify(board[move.getEnd().getRow()][move.getEnd().getCol()]);
     move.getChessPiece()->incrementTotalMoves();
-    return true;
+    return res;
 }
 
-bool TwoPlayerChessBoard::isMoveLegal(const Move& move, ChessColor color) {
+MoveResult TwoPlayerChessBoard::isMoveLegal(const Move& move, ChessColor color) {
     // check if the starting and ending position are valid
-    if (!isValidPos(move.getStart()) || !isValidPos(move.getEnd())) return false;
+    if (!isValidPos(move.getStart()) || !isValidPos(move.getEnd())) return {false, false};
     // check if the player has a chess at the starting position
     const Cell& cell = getCellAtPos(move.getStart());
-    if (!cell.isOccupiedByColor(color)) return false;
+    if (!cell.isOccupiedByColor(color)) return {false, false};
     ChessPiece* chessPiece = cell.getChessPiece();
     return chessPiece->isMovePossiblyValid(*this, move);
 }

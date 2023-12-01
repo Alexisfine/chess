@@ -33,25 +33,12 @@ void ChessGame::start(PlayerType pt1, PlayerType pt2) {
     isChecked[1] = false;
 }
 
-bool ChessGame::makeMove(const Position& from, const Position& to) {
+MoveResult ChessGame::makeMove(const Position& from, const Position& to) {
     Move move {from, to, chessBoard->getCellAtPos(from).getChessPiece()};
-    bool flag = chessBoard->makeMove(move, players[currentTurn]->getColor());
+    MoveResult moveResult = chessBoard->makeMove(move, players[currentTurn]->getColor());
 
-    if (!flag) return flag;
+    if (!moveResult.success) return moveResult;
     switchTurn();
-    // Pawn promotion
-    ChessPiece* cp = chessBoard->getCellAtPos(to).getChessPiece();
-    if (cp->getType() == ChessType::PAWN) {
-        if (cp->getColor() == ChessColor::WHITE && to.getRow() == 8) {
-            chessBoard->remove(to);
-            addChess(to, ChessColor::WHITE, ChessType::ROOK);
-        } else if (cp->getColor() == ChessColor::BLACK && to.getRow() == 1) {
-            chessBoard->remove(to);
-            addChess(to, ChessColor::BLACK, ChessType::ROOK);
-        }
-    }
-
-
 
     if (move.getChessPiece()->getColor() == ChessColor::WHITE) {
         if (chessBoard->isColorInCheck(ChessColor::BLACK)) {
@@ -76,13 +63,12 @@ bool ChessGame::makeMove(const Position& from, const Position& to) {
             }
         }
     }
-    return flag;
+    return moveResult;
 }
 
-bool ChessGame::move(const Position& from, const Position& to) {
-    bool res = makeMove(from, to);
-
-    if (inGame && res) {
+MoveResult ChessGame::move(const Position& from, const Position& to) {
+    MoveResult res = makeMove(from, to);
+    if (inGame && res.success) {
         int possibleMoves = 0;
         if (chessBoard->getCellAtPos(to).isOccupiedByColor(ChessColor::WHITE)) {
             possibleMoves = chessBoard->getAllValidMoves(ChessColor::BLACK, true).size();
@@ -170,20 +156,28 @@ void ChessGame::init() {
 }
 
 bool ChessGame::autoMove(ChessColor color) {
-    bool res = true;
+    MoveResult res;
     if (color == ChessColor::WHITE) {
         if (players[0]->getPlayerType() != PlayerType::COMPUTER) return false;
         ComputerPlayer* player = dynamic_cast<ComputerPlayer*>(players[0]);
         ValidMove move = player->getMove();
         res = chessBoard->makeMove(move, color);
+        if (res.success && res.pawnPromotion) {
+            removeChess(move.getEnd());
+            addChess(move.getEnd(), ChessColor::WHITE, ChessType::QUEEN);
+        }
     } else {
         if (players[1]->getPlayerType() != PlayerType::COMPUTER) return false;
         ComputerPlayer* player = dynamic_cast<ComputerPlayer*>(players[1]);
         ValidMove move = player->getMove();
         res = chessBoard->makeMove(move, color);
+        if (res.success && res.pawnPromotion) {
+            removeChess(move.getEnd());
+            addChess(move.getEnd(), ChessColor::BLACK, ChessType::QUEEN);
+        }
     }
-    if (res) switchTurn();
-    return res;
+    if (res.success) switchTurn();
+    return res.success;
 }
 
 void ChessGame::erase() {
@@ -194,12 +188,15 @@ void ChessGame::erase() {
     }
 }
 
+void ChessGame::promotePawn(ChessType chessType, const Position& pos) {
+    removeChess(pos);
+    if (currentTurn == 0) {
+        addChess(pos, ChessColor::BLACK, chessType);
+    } else {
+        addChess(pos, ChessColor::WHITE, chessType);
+    }
+}
 
-
-
-
-
-
-
-
-
+void ChessGame::completeSetup() {
+    chessBoard->completeSetup();
+}
