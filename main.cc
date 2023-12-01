@@ -128,6 +128,7 @@ int main() {
                              break;
                          case 'n':
                              newChess = ChessType::KNIGHT;
+                             break;
                          default:
                              newChess = ChessType::QUEEN;
                      }

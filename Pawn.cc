@@ -74,7 +74,7 @@ std::vector<ValidMove> Pawn::getAvailableMoves(ChessBoard& board, const Position
 //    }
 
 
-    if (totalMoves == 0) {
+    if ((color == ChessColor::WHITE && curPosition.getRow() == 2) || (color == ChessColor::BLACK && curPosition.getRow() == 7)) {
         Position newPosition2 {curPosition.getRow() + moveDy * 2, curPosition.getCol() + moveDx * 2};
         if (board.isValidPos(newPosition2) && board.isPositionEmpty(newPosition) && board.isPositionEmpty(newPosition2)) {
             ValidMove possibleMove2 {curPosition, newPosition2, this, false, canCheck};

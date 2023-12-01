@@ -1,15 +1,15 @@
-#ifndef CHESS_DISPLAY_H
-#define CHESS_DISPLAY_H
+#ifndef CHESS_XDISPLAY_H
+#define CHESS_XDISPLAY_H
 
 class Cell;
 enum class displayType {Text, Graphical};
 
-class Display {
+class XDisplay {
     public:
         virtual displayType disType() = 0;
         virtual void notify(Cell &c) = 0;
-        virtual ~Display() = default;
+        virtual ~XDisplay() = default;
 };
 
 
-#endif //CHESS_DISPLAY_H
+#endif //CHESS_XDISPLAY_H

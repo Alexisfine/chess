@@ -2,10 +2,10 @@
 #define __TEXTDISPLAY_H__
 #include <iostream>
 #include <vector>
-#include "Display.h"
+#include "XDisplay.h"
 class Cell;
 
-class TextDisplay: public Display {
+class TextDisplay: public XDisplay {
   std::vector<std::vector<char>> theDisplay;
   const int gridSize;
  public:

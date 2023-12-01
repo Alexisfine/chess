@@ -40,16 +40,13 @@ MoveResult ChessGame::makeMove(const Position& from, const Position& to) {
     if (!moveResult.success) return moveResult;
     switchTurn();
 
-    if (move.getChessPiece()->getColor() == ChessColor::WHITE) {
-        if (chessBoard->isColorInCheck(ChessColor::BLACK)) {
-            isChecked[1] = true;
-        }
-    }
-    if (move.getChessPiece()->getColor() == ChessColor::BLACK) {
-        if (chessBoard->isColorInCheck(ChessColor::WHITE)) {
-            isChecked[0] = true;
-        }
-    }
+    if (chessBoard->isColorInCheck(ChessColor::BLACK)) {
+        isChecked[1] = true;
+    } else isChecked[1] = false;
+
+    if (chessBoard->isColorInCheck(ChessColor::WHITE)) {
+        isChecked[0] = true;
+    } else isChecked[0] = false;
 
     for (auto player : players) {
         if (chessBoard->isColorInCheckMate(player->getColor())) {
@@ -178,7 +175,16 @@ bool ChessGame::autoMove(ChessColor color) {
             addChess(move.getEnd(), ChessColor::BLACK, ChessType::QUEEN);
         }
     }
-    if (res.success) switchTurn();
+    if (res.success) {
+        if (chessBoard->isColorInCheck(ChessColor::BLACK)) {
+            isChecked[1] = true;
+        } else isChecked[1] = false;
+        if (chessBoard->isColorInCheck(ChessColor::WHITE)) {
+            isChecked[0] = true;
+        } else isChecked[0] = false;
+        switchTurn();
+
+    }
     return res.success;
 }
 
@@ -194,15 +200,16 @@ void ChessGame::promotePawn(ChessType chessType, const Position& pos) {
     removeChess(pos);
     if (currentTurn == 0) {
         addChess(pos, ChessColor::BLACK, chessType);
-        if (chessBoard->isColorInCheck(ChessColor::WHITE)) {
-            isChecked[0] = true;
-        }
     } else {
         addChess(pos, ChessColor::WHITE, chessType);
-        if (chessBoard->isColorInCheck(ChessColor::BLACK)) {
-            isChecked[1] = true;
-        }
     }
+    if (chessBoard->isColorInCheck(ChessColor::BLACK)) {
+        isChecked[1] = true;
+    } else isChecked[1] = false;
+
+    if (chessBoard->isColorInCheck(ChessColor::WHITE)) {
+        isChecked[0] = true;
+    } else isChecked[0] = false;
 
 
     for (auto player : players) {
