@@ -53,7 +53,7 @@ MoveResult TwoPlayerChessBoard::makeMove(Move move, ChessColor color) {
     if (!isPositionEmpty(move.getEnd()) && isPositionOccupiedByColor(move.getEnd(),color)) return {false, false};
 
     // capture this chess
-    ChessPiece* capturedChess = getCellAtPos(move.getEnd()).getChessPiece();
+    ChessPiece* capturedChess = board[move.getEnd().getRow()][move.getEnd().getCol()].getChessPiece();
     if (capturedChess) {
         remove(move.getEnd());
     }
@@ -104,7 +104,7 @@ MoveResult TwoPlayerChessBoard::isMoveLegal(const Move& move, ChessColor color) 
     // check if the starting and ending position are valid
     if (!isValidPos(move.getStart()) || !isValidPos(move.getEnd())) return {false, false};
     // check if the player has a chess at the starting position
-    const Cell& cell = getCellAtPos(move.getStart());
+    const Cell& cell = board[move.getStart().getRow()][move.getStart().getCol()];
     if (!cell.isOccupiedByColor(color)) return {false, false};
     ChessPiece* chessPiece = cell.getChessPiece();
     return chessPiece->isMovePossiblyValid(*this, move);
@@ -293,5 +293,50 @@ bool TwoPlayerChessBoard::simulateEnPassant(Move move, ChessColor color) {
     board[start.getRow()][end.getCol()].addChessPiece(capturedPawn);
 
     return check;
+}
+
+//return true if the piece can be captured by opponent's piece in the next move
+bool TwoPlayerChessBoard::simulateCapture(Move move, ChessColor color) {
+    Position start = move.getStart();
+    Position end = move.getEnd();
+    ChessPiece* movedPiece = move.getChessPiece();
+
+    // Store the original state
+    ChessPiece* originalPieceAtEnd = board[end.getRow()][end.getCol()].getChessPiece();
+
+    // Simulate the move
+    board[start.getRow()][start.getCol()].removeChessPiece();
+    board[end.getRow()][end.getCol()].addChessPiece(movedPiece);
+
+    // Check if any opponent's piece can capture the moved piece
+    bool canBeCaptured = false;
+    for (int row = 1; row <= getDimension(); ++row) {
+        for (int col = 1; col <= getDimension(); ++col) {
+            Position pos(row, col);
+            const Cell& cell = board[pos.getRow()][pos.getCol()];
+            if (cell.isOccupied() && cell.getChessPiece()->getColor() != color) {
+                // Check each of the opponent's piece's valid moves
+                std::vector<ValidMove> opponentMoves = cell.getChessPiece()->getAvailableMoves(*this, pos, true);
+                for (const ValidMove& oppMove : opponentMoves) {
+                    if (oppMove.getEnd() == end) {
+                        canBeCaptured = true;
+                        break;
+                    }
+                }
+            }
+            if (canBeCaptured) break;
+        }
+        if (canBeCaptured) break;
+    }
+
+    // Undo the move
+    board[start.getRow()][start.getCol()].addChessPiece(movedPiece);
+    if (originalPieceAtEnd) {
+        board[end.getRow()][end.getCol()].addChessPiece(originalPieceAtEnd);
+    } else {
+        board[end.getRow()][end.getCol()].removeChessPiece();
+    }
+
+    return canBeCaptured;
 }
 

@@ -18,6 +18,8 @@ public:
     bool getEnPassant() const;
     void setPromotion(bool p);
     bool getPromotion();
+    bool getCanCapture() const;
+    bool getCanCheck() const;
 };
 
 

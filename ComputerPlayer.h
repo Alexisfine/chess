@@ -9,10 +9,10 @@ class ComputerPlayer : public Player {
     bool oneMove();
     public:
         ComputerPlayer(int playerNo, ChessBoard* board, const ChessColor& color);
+        void setLevel(int newLevel);
         const ChessColor getColor() const override;
         int randomint(int size);
         ValidMove getMove();
-
 };
 
 
