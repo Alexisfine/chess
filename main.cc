@@ -62,8 +62,9 @@ ChessColor strToColor(string str) {
 }
 
 int main() {
+    XWindow xw {};
     string command, aux;
-    ChessGame game {8};
+    ChessGame game {8, xw};
     PlayerType pt1;
     PlayerType pt2;
 
@@ -177,6 +178,11 @@ int main() {
                 game.start(pt1, pt2);
                 cout << "Game begins" << endl;
                 cout << game << endl;
+                // stalemate setup
+                if (game.getResult() == GameResult::DRAW) {
+                    cout << "Stalemate" << endl;
+                    game.init();
+                }
             } else if (command == "setup") {
                 if (game.hasStarted()) {
                     cout << "Invalid Command, the game has already started" << endl;

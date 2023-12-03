@@ -3,7 +3,6 @@
 #include <iostream>
 #include <vector>
 #include "XDisplay.h"
-class Cell;
 
 class TextDisplay: public XDisplay {
   std::vector<std::vector<char>> theDisplay;
@@ -12,7 +11,7 @@ class TextDisplay: public XDisplay {
   TextDisplay(int n);
   displayType disType() override;
   void notify(Cell &c) override;
-  ~TextDisplay();
+  ~TextDisplay() override;
   friend std::ostream &operator<<(std::ostream &out, const TextDisplay &td);
 };
 

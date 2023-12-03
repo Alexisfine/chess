@@ -26,7 +26,7 @@ class ChessGame {
     void switchTurn();
 
 public:
-    ChessGame(int dimension);
+    ChessGame(int dimension, XWindow& xw);
     ~ChessGame();
     void start(PlayerType pt1, PlayerType pt2);
     void resign();

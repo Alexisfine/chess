@@ -4,7 +4,9 @@
 #include "ComputerPlayer.h"
 #include <iostream>
 
-ChessGame::ChessGame(int dimension) : chessBoard{new TwoPlayerChessBoard{dimension}} {}
+ChessGame::ChessGame(int dimension, XWindow& xw) : chessBoard{new TwoPlayerChessBoard{dimension}} {
+    chessBoard->addGraphicsDisplay(xw);
+}
 
 ChessGame::~ChessGame() {
     for (auto player : players) delete player;
@@ -31,6 +33,20 @@ void ChessGame::start(PlayerType pt1, PlayerType pt2) {
     gameResult = GameResult::IN_PROGRESS;
     isChecked[0] = false;
     isChecked[1] = false;
+
+    int possibleMoves = 0;
+    if (currentTurn == 0) {
+        possibleMoves = chessBoard->getAllValidMoves(ChessColor::WHITE, true).size();
+
+    } else {
+        possibleMoves = chessBoard->getAllValidMoves(ChessColor::BLACK, true).size();
+    }
+    if (possibleMoves == 0) {
+        inGame = false;
+        gameResult = GameResult::DRAW;
+        score[0] += 0.5;
+        score[1] += 0.5;
+    }
 }
 
 MoveResult ChessGame::makeMove(const Position& from, const Position& to) {

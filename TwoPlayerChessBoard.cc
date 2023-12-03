@@ -91,6 +91,11 @@ MoveResult TwoPlayerChessBoard::makeMove(Move move, ChessColor color) {
 
     textDisplay.notify(board[move.getStart().getRow()][move.getStart().getCol()]);
     textDisplay.notify(board[move.getEnd().getRow()][move.getEnd().getCol()]);
+    if (graphicalDisplay) {
+        graphicalDisplay->notify(board[move.getStart().getRow()][move.getStart().getCol()]);
+        graphicalDisplay->notify(board[move.getEnd().getRow()][move.getEnd().getCol()]);
+    }
+
     move.getChessPiece()->incrementTotalMoves();
     return res;
 }
@@ -224,11 +229,17 @@ void TwoPlayerChessBoard::addTo(const Position& pos, ChessColor color, ChessType
     chessPieces.emplace_back(newPiece);
     board[pos.getRow()][pos.getCol()].addChessPiece(newPiece);
     textDisplay.notify(board[pos.getRow()][pos.getCol()]);
+    if (graphicalDisplay) {
+        graphicalDisplay->notify(board[pos.getRow()][pos.getCol()]);
+    }
 }
 
 void TwoPlayerChessBoard::remove(const Position& pos) {
     board[pos.getRow()][pos.getCol()].removeChessPiece();
     textDisplay.notify(board[pos.getRow()][pos.getCol()]);
+    if (graphicalDisplay) {
+        graphicalDisplay->notify(board[pos.getRow()][pos.getCol()]);
+    }
 }
 
 bool TwoPlayerChessBoard::verifySetup() {

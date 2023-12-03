@@ -5,7 +5,7 @@
 #include <vector>
 #include "Cell.h"
 #include "TextDisplay.h"
-
+#include "GraphicsDisplay.h"
 class Move;
 class Position;
 class ChessPiece;
@@ -13,6 +13,7 @@ enum class ChessColor;
 enum class ChessType;
 class ValidMove;
 struct MoveResult;
+class GraphicsDisplay;
 
 
 
@@ -21,6 +22,7 @@ protected:
     int dimension;
     std::vector<std::vector<Cell>> board;
     TextDisplay textDisplay;
+    GraphicsDisplay* graphicalDisplay;
     std::vector<ChessPiece*> chessPieces;
 public:
     ChessBoard(int dimension);
@@ -43,6 +45,7 @@ public:
     virtual std::vector<ValidMove> getAllValidMoves(ChessColor color, bool check) = 0;
     void completeSetup();
     friend std::ostream &operator<<(std::ostream &out, const ChessBoard& board);
+    void addGraphicsDisplay(XWindow& xw);
 };
 
 #endif //CHESS_CHESSBOARD_H

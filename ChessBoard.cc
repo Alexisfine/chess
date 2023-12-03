@@ -1,7 +1,7 @@
 #include "ChessBoard.h"
 
 ChessBoard::ChessBoard(int dimension) : dimension{dimension}, 
-board(dimension + 1, std::vector<Cell>(dimension + 1)), textDisplay{dimension}{
+board(dimension + 1, std::vector<Cell>(dimension + 1)), textDisplay{dimension}, graphicalDisplay{nullptr}{
     for (int row = 0; row <= dimension; row++) {
         for (int col = 0; col <= dimension; col++) {
             board[row][col] = {row, col};
@@ -28,7 +28,18 @@ int ChessBoard::getDimension() const {
     return dimension;
 }
 
-ChessBoard::~ChessBoard() {}
+void ChessBoard::addGraphicsDisplay(XWindow& xw) {
+    graphicalDisplay = new GraphicsDisplay {xw, dimension};
+    for (int row = 1; row <= dimension; row++) {
+        for (int col = 1; col <= dimension; col++) {
+            graphicalDisplay->notify(board[row][col]);
+        }
+    }
+}
+
+ChessBoard::~ChessBoard() {
+    delete graphicalDisplay;
+}
 
 std::ostream &operator<<(std::ostream &out, const ChessBoard& board) {
     out << board.textDisplay;
