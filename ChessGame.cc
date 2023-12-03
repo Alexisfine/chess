@@ -24,9 +24,9 @@ void ChessGame::start(PlayerType pt1, PlayerType pt2) {
     }
 
     if (pt2 == PlayerType::HUMAN) {
-        players[1] = new HumanPlayer{1, chessBoard, ChessColor::BLACK};
+        players[1] = new HumanPlayer{2, chessBoard, ChessColor::BLACK};
     } else {
-        players[1] = new ComputerPlayer{1, chessBoard, ChessColor::BLACK};
+        players[1] = new ComputerPlayer{2, chessBoard, ChessColor::BLACK};
     }
 
     inGame = true;
