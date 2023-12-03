@@ -5,12 +5,14 @@
 #include "Player.h"
 
 class ComputerPlayer : public Player {
-    int level;
+    int level = 1;
+    bool oneMove();
     public:
         ComputerPlayer(int playerNo, ChessBoard* board, const ChessColor& color);
-        ChessColor getColor();
-        bool oneMove();
+        const ChessColor getColor() const override;
         int randomint(int size);
+        ValidMove getMove();
+
 };
 
 

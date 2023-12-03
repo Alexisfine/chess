@@ -1,46 +1,59 @@
 #include "Bishop.h"
 
-Bishop::Bishop(ChessBoard& board, Player& owner):
-    ChessPiece(ChessType::BISHOP, board, owner) {}
+Bishop::Bishop(ChessColor color):
+    ChessPiece(ChessType::BISHOP, color) {}
 
-bool Bishop::isMovePossiblyValid(const Move& move) {
-    std::vector<ValidMove> possibleValidMoves = getAvailableMoves(move.getStart());
+MoveResult Bishop::isMovePossiblyValid(ChessBoard& board, const Move& move) {
+    std::vector<ValidMove> possibleValidMoves = getAvailableMoves(board, move.getStart(), false);
     for (auto validMove : possibleValidMoves) {
-        if (move.getStart() == validMove.getStart() && move.getEnd() == validMove.getEnd()) return true;
+        if (move.getStart() == validMove.getStart() && move.getEnd() == validMove.getEnd()) return {true, false};
     }
-    return false;
+    return {false, false};
 }
 
-void Bishop::addPossibleMoveByDirection(std::vector<ValidMove> possibleMoves,
-                                        const Position& curPosition, int dy, int dx, int maxMoves) {
+std::vector<ValidMove> Bishop::addPossibleMoveByDirection(ChessBoard& board,
+                                        const Position& curPosition, int dy, int dx, int maxMoves, bool check) {
+    vector<ValidMove> newMoves;
     int curRow = curPosition.getRow();
     int curCol = curPosition.getCol();
     for (int x = 0; x < maxMoves; x++) {
         Position newPosition {curRow + dy, curCol + dx};
-        if (!board.isValidPos(newPosition)) return; // check if position is valid
+        if (!board.isValidPos(newPosition)) return newMoves; // check if position is valid
         const Cell& cell = board.getCellAtPos(newPosition);
         bool canCapture = false;
         bool canCheck = false;
         if (cell.isOccupied()) {
             canCapture = true;
-            if (!cell.isOccupiedByMe(owner)) {
+            if (!cell.isOccupiedByColor(color)) {
                 ValidMove possibleMove {curPosition, newPosition, this, canCapture, canCheck};
-                possibleMoves.emplace_back(possibleMove);
+                if (check) {
+                    bool willCheck = board.simulateMove(possibleMove, color);
+                    if (!willCheck) {
+                        newMoves.emplace_back(possibleMove);
+                    }
+                } else {
+                    newMoves.emplace_back(possibleMove);
+                }
             }
             break; //cannot move pass another chesspiece
         }
         //if the cell is not occupied
         ValidMove possibleMove {curPosition, newPosition, this, canCapture, canCheck};
-        possibleMoves.emplace_back(possibleMove);
+        if (check) {
+            bool willCheck = board.simulateMove(possibleMove, color);
+            if (!willCheck) newMoves.emplace_back(possibleMove);
+        } else newMoves.emplace_back(possibleMove);
+
 
         // update curRow and curCol
         curRow += dy;
         curCol += dx;
     }
+    return newMoves;
 }
 
 
-std::vector<ValidMove> Bishop::getAvailableMoves(const Position& curPosition)  {
+std::vector<ValidMove> Bishop::getAvailableMoves(ChessBoard& board, const Position& curPosition, bool check)  {
     std::vector<ValidMove> moves;
     int curRow = curPosition.getRow();
     int curCol = curPosition.getCol();
@@ -56,17 +69,23 @@ std::vector<ValidMove> Bishop::getAvailableMoves(const Position& curPosition)  {
     int DR = std::min(RX, downY); //down-right direction
     int DL = std::min(LX, downY); //down-left direction
     //1. Up-right diagonal moves
-    addPossibleMoveByDirection(moves, curPosition, 1, 1, UR);
+    auto upRight = addPossibleMoveByDirection(board, curPosition, 1, 1, UR, check);
+    for (auto move : upRight) moves.emplace_back(move);
 
     //2. Up-left diagonal moves
-    addPossibleMoveByDirection(moves, curPosition, 1, -1, UL);
+    auto upLeft = addPossibleMoveByDirection(board, curPosition, 1, -1, UL, check);
+    for (auto move : upLeft) moves.emplace_back(move);
 
     //3. Down-right diagonal moves
-    addPossibleMoveByDirection(moves, curPosition, -1, 1, DR);
+    auto downRight = addPossibleMoveByDirection(board, curPosition, -1, 1, DR, check);
+    for (auto move : downRight) moves.emplace_back(move);
 
     //4. Down-left diagonal moves
-    addPossibleMoveByDirection(moves, curPosition, -1, -1, DL);
+    auto downLeft = addPossibleMoveByDirection(board, curPosition, -1, -1, DL, check);
+    for (auto move : downLeft) moves.emplace_back(move);
 
     return moves;
 }
+
+
 

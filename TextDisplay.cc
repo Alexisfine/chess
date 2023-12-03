@@ -3,15 +3,16 @@
 #include "Cell.h"
 using namespace std;
 
-TextDisplay::TextDisplay(int n) : theDisplay(n), gridSize{n} { // Initialize theDisplay with size n
-    theDisplay[0] = {'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'};
-    theDisplay[n - 1] = {'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'};
-    theDisplay[1] = std::vector<char>(8, 'p');
-    theDisplay[n - 2] = std::vector<char>(8, 'P');
-    for (int i = 2; i < n - 2; ++i) {
-        theDisplay[i].resize(n); // Ensure each inner vector is of size n
-        for (int j = 0; j < n; ++j) {
-            if (i % 2 == j % 2) {
+TextDisplay::TextDisplay(int n) : theDisplay(n+1), gridSize{n} { // Initialize theDisplay with size n
+//    theDisplay[1] = {'_','R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'};
+//    theDisplay[n] = {'_','r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'};
+//    theDisplay[2] = std::vector<char>(9, 'P');
+//    theDisplay[n - 2] = std::vector<char>(9, 'p');
+
+    for (int i = 0; i <= n; ++i) {
+        theDisplay[i].resize(n+1); // Ensure each inner vector is of size n
+        for (int j = 1; j <= n; ++j) {
+            if ((i % 2 == j % 2) || ((i % 2 == 1) && (j % 2 == 1))) {
                 theDisplay[i][j] = '_';
             } else {
                 theDisplay[i][j] = ' ';
@@ -25,8 +26,8 @@ displayType TextDisplay::disType() {
 }
 
 void TextDisplay::notify(Cell &c) {
-    int row = c.getPosition()[0];
-    int col = c.getPosition()[1];
+    int row = c.getPosition().getRow();
+    int col = c.getPosition().getCol();
     //if there is a chesspiece on the cell
     if (c.isOccupied()) {
         ChessPiece* myChessPiece = c.getChessPiece();
@@ -54,7 +55,7 @@ void TextDisplay::notify(Cell &c) {
         theDisplay[row][col] = displayChar;    
     }
     //if the cell is empty
-    else if (row % 2 == col % 2) {
+    else if ((row % 2 == col % 2) || (row % 2 == 1 && col % 2 == 1)) {
         theDisplay[row][col] = '_';
     } else {
         theDisplay[row][col] = ' ';
@@ -63,12 +64,10 @@ void TextDisplay::notify(Cell &c) {
 
 TextDisplay::~TextDisplay() {}
 
-ostream &operator<<(ostream &out, const TextDisplay &td) {
-    int row = gridSize;
-    for (int i = 0; i < td.gridSize; ++i) { // loop through TextDisplay (a 2D vector) 
-        out << row << " "; // print the row number (starts at 8)
-        row--;
-        for (int j = 0; j < td.gridSize; ++j) {
+std::ostream &operator<<(std::ostream &out, const TextDisplay &td) {
+    for (int i = td.gridSize; i > 0; --i) { // loop through TextDisplay (a 2D vector)
+        out << i << " "; // print the row number (starts at 1)
+        for (int j = 1; j <= td.gridSize; ++j) {
             out << td.theDisplay[i][j]; // prints out cell (empty cell or a chesspiece)
         }
         out << endl;
@@ -77,6 +76,7 @@ ostream &operator<<(ostream &out, const TextDisplay &td) {
 
     // print column letters (a,b,...,h)
     char ch = 'a';
+    out << "  ";
     for (int i = 0; i < td.gridSize; ++i) {
         out << ch;
         ch++;

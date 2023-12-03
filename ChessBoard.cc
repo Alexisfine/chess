@@ -1,21 +1,57 @@
 #include "ChessBoard.h"
 
-ChessBoard::ChessBoard(int dimension) : dimension{dimension}, board(dimension, std::vector<Cell>(dimension)){}
+ChessBoard::ChessBoard(int dimension) : dimension{dimension}, 
+board(dimension + 1, std::vector<Cell>(dimension + 1)), textDisplay{dimension}, graphicalDisplay{nullptr}{
+    for (int row = 0; row <= dimension; row++) {
+        for (int col = 0; col <= dimension; col++) {
+            board[row][col] = {row, col};
+        }
+    }
+}
 const Cell& ChessBoard::getCellAtPos(const Position& pos) const {
     return board[pos.getRow()][pos.getCol()];
 }
-void ChessBoard::setPieceAtPosition(const Position& pos, ChessPiece& piece) {
-    board[pos.getRow()][pos.getCol()].addChessPiece(piece);
+
+void ChessBoard::remove(const Position& pos) {
+    board[pos.getRow()][pos.getCol()].removeChessPiece();
 }
 
 bool ChessBoard::isPositionEmpty(const Position& pos) const {
     return !board[pos.getRow()][pos.getCol()].isOccupied();
 }
 
-bool ChessBoard::isPositionOccupiedByPlayer(const Position& pos, const Player& player) const {
-    return board[pos.getRow()][pos.getCol()].isOccupiedByMe(player);
+bool ChessBoard::isPositionOccupiedByColor(const Position& pos, const ChessColor& color) const {
+    return board[pos.getRow()][pos.getCol()].isOccupiedByColor(color);
 }
 
 int ChessBoard::getDimension() const {
     return dimension;
+}
+
+void ChessBoard::addGraphicsDisplay(XWindow& xw) {
+    graphicalDisplay = new GraphicsDisplay {xw, dimension};
+    for (int row = 1; row <= dimension; row++) {
+        for (int col = 1; col <= dimension; col++) {
+            graphicalDisplay->notify(board[row][col]);
+        }
+    }
+}
+
+ChessBoard::~ChessBoard() {
+    delete graphicalDisplay;
+}
+
+std::ostream &operator<<(std::ostream &out, const ChessBoard& board) {
+    out << board.textDisplay;
+    return out;
+}
+
+void ChessBoard::completeSetup() {
+    for (int row = 1; row <= dimension; row++) {
+        for (int col = 1; col <= dimension; col++) {
+            if (board[row][col].isOccupied()) {
+                board[row][col].getChessPiece()->incrementTotalMoves();
+            }
+        }
+    }
 }

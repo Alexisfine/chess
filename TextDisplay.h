@@ -2,19 +2,17 @@
 #define __TEXTDISPLAY_H__
 #include <iostream>
 #include <vector>
-#include "Display.h"
-class Cell;
+#include "XDisplay.h"
 
-class TextDisplay: public Display {
+class TextDisplay: public XDisplay {
   std::vector<std::vector<char>> theDisplay;
   const int gridSize;
  public:
   TextDisplay(int n);
   displayType disType() override;
   void notify(Cell &c) override;
-  ~TextDisplay();
+  ~TextDisplay() override;
   friend std::ostream &operator<<(std::ostream &out, const TextDisplay &td);
 };
-
 
 #endif

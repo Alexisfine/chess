@@ -3,19 +3,18 @@
 
 
 #include "Position.h"
-#include "ChessPiece.h"
-#include <memory>
+class ChessPiece;
 
 class Move {
 protected:
     Position start;
     Position end;
-    const ChessPiece* chessPiece;
+    ChessPiece* chessPiece;
 public:
-    Move(Position start, Position end, const ChessPiece* chessPiece);
+    Move(Position start, Position end, ChessPiece* chessPiece);
     const Position& getStart() const;
     const Position& getEnd() const;
-    const ChessPiece* getChessPiece() const;
+    ChessPiece* getChessPiece();
 };
 
 

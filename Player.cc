@@ -1,7 +1,8 @@
 #include "Player.h"
 
-Player::Player(int playerNo, bool isComputer, ChessBoard* board, const ChessColor& color) :
-    playerNo{playerNo}, isComputer{isComputer}, board{board}, color{color} {}
+
+Player::Player(int playerNo, PlayerType playerType, ChessBoard* board, const ChessColor color) :
+    playerNo{playerNo}, playerType{playerType}, board{board}, color{color} {}
 
 int Player::getPlayerNo() const {
     return playerNo;
@@ -9,3 +10,13 @@ int Player::getPlayerNo() const {
 const ChessColor Player::getColor() const{
     return color;
 }
+
+Player::~Player() {}
+
+PlayerType Player::getPlayerType() {
+    return playerType;
+}
+
+
+
+
