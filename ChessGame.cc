@@ -31,6 +31,7 @@ void ChessGame::start(PlayerType pt1, PlayerType pt2, int level1, int level2) {
         players[1] = new ComputerPlayer{2, chessBoard, ChessColor::BLACK};
         auto compPlayer = dynamic_cast<ComputerPlayer*>(players[1]);
         if (compPlayer) compPlayer->setLevel(level2);
+
     }
 
     inGame = true;

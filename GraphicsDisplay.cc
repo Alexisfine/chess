@@ -64,16 +64,16 @@ GraphicsDisplay::GraphicsDisplay(XWindow& xw, int gs) :
 void GraphicsDisplay::notify(Cell& c)  {
     int cellSize = windowSize / gridSize;
     int x = c.getPosition().getCol() * cellSize;
-    int y = (gridSize - c.getPosition().getRow()) * cellSize;
-    int row = gridSize - c.getPosition().getRow();
+    int y = (gridSize - 1 - c.getPosition().getRow()) * cellSize;
+    int row = gridSize - 1 - c.getPosition().getRow();
     int col = c.getPosition().getCol();
-    int color = row % 2 != col % 2 ? XWindow::DarkRed : XWindow::Brown;
+    int color = row % 2 == col % 2 ? XWindow::Black : XWindow::White;
     xw.fillRectangle(x, y, cellSize, cellSize, color);
     gridDisplay[row][col] = mapChessPieceToChar(c);
     if (c.isOccupied()) {
         if (c.isOccupiedByColor(ChessColor::WHITE)) {
-            xw.drawString(x + (cellSize / 3), y + (cellSize / 2), mapChessPieceToChar(c), XWindow::White);
-        } else xw.drawString(x + (cellSize / 3), y + (cellSize / 2), mapChessPieceToChar(c), XWindow::Black);
+            xw.drawString(x + (cellSize / 3), y + (cellSize / 2), mapChessPieceToChar(c), XWindow::Red);
+        } else xw.drawString(x + (cellSize / 3), y + (cellSize / 2), mapChessPieceToChar(c), XWindow::Red);
     }
 }
 
@@ -81,18 +81,19 @@ void GraphicsDisplay::drawGrid() {
     int cellSize = windowSize / gridSize;
     char col = 'a';
     string colStr;
-    for (int i = 1; i <= gridSize; i++) {
-        colStr = {col};
-        xw.drawString(i*cellSize + cellSize/3, cellSize/2, colStr);
-        col += 1;
-    }
-    for (int i = 1; i <= gridSize; i++) {
-        xw.drawString(cellSize/3, i * cellSize + cellSize/2, to_string(gridSize-i));
+    for (int i = 0; i < gridSize - 1; i++) {
+        xw.drawString(cellSize/3, i * cellSize + cellSize/2, to_string(gridSize-i-1));
         for (int j = 1; j < gridSize; j++) {
             if (i % 2 == j % 2) {
-                xw.fillRectangle(j*cellSize, i*cellSize, cellSize, cellSize, XWindow::DarkRed);
-            } else xw.fillRectangle(j*cellSize, i*cellSize, cellSize, cellSize, XWindow::Brown);
+                xw.fillRectangle(j*cellSize, i*cellSize, cellSize, cellSize, XWindow::Black);
+            } else xw.fillRectangle(j*cellSize, i*cellSize, cellSize, cellSize, XWindow::White);
         }
+    }
+
+    for (int i = 1; i <= gridSize; i++) {
+        colStr = {col};
+        xw.drawString(i*cellSize + cellSize/3, cellSize * 8 + cellSize/2, colStr);
+        col += 1;
     }
 }
 
