@@ -67,7 +67,7 @@ void GraphicsDisplay::notify(Cell& c)  {
     int y = (gridSize - 1 - c.getPosition().getRow()) * cellSize;
     int row = gridSize - 1 - c.getPosition().getRow();
     int col = c.getPosition().getCol();
-    int color = row % 2 != col % 2 ? XWindow::Black : XWindow::White;
+    int color = row % 2 == col % 2 ? XWindow::Black : XWindow::White;
     xw.fillRectangle(x, y, cellSize, cellSize, color);
     gridDisplay[row][col] = mapChessPieceToChar(c);
     if (c.isOccupied()) {
