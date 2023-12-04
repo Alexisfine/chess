@@ -11,7 +11,6 @@ void TwoPlayerChessBoard::setupBoard() {
             remove({row, col});
         }
     }
-    for (auto chess : chessPieces) delete chess;
     chessPieces.clear();
 
     for (int col = 1; col <= dimension; col++) {
@@ -139,7 +138,6 @@ bool TwoPlayerChessBoard::isValidPos(const Position& pos) const {
 }
 
 TwoPlayerChessBoard::~TwoPlayerChessBoard() {
-    for (auto chess : chessPieces) delete chess;
 }
 
 
@@ -230,29 +228,30 @@ bool TwoPlayerChessBoard::simulateMove(Move move, ChessColor color) {
 }
 
 void TwoPlayerChessBoard::addTo(const Position& pos, ChessColor color, ChessType chessType) {
-    ChessPiece* newPiece;
+    std::unique_ptr<ChessPiece> newPiece;
     switch (chessType) {
         case ChessType::KING:
-            newPiece = new King {color};
+            newPiece = std::make_unique<King>(color);
             break;
         case ChessType::QUEEN:
-            newPiece = new Queen {color};
+            newPiece = std::make_unique<Queen>(color);
             break;
         case ChessType::BISHOP:
-            newPiece = new Bishop {color};
+            newPiece = std::make_unique<Bishop>(color);
             break;
         case ChessType::ROOK:
-            newPiece = new Rook {color};
+            newPiece = std::make_unique<Rook>(color);
             break;
         case ChessType::KNIGHT:
-            newPiece = new Knight{color};
+            newPiece = std::make_unique<Knight>(color);
             break;
         case ChessType::PAWN:
-            newPiece = new Pawn{color};
+            newPiece = std::make_unique<Pawn>(color);
             break;
     }
-    chessPieces.emplace_back(newPiece);
-    board[pos.getRow()][pos.getCol()].addChessPiece(newPiece);
+    board[pos.getRow()][pos.getCol()].addChessPiece(newPiece.get());
+    chessPieces.emplace_back(std::move(newPiece));
+
     textDisplay.notify(board[pos.getRow()][pos.getCol()]);
     if (graphicalDisplay) {
         graphicalDisplay->notify(board[pos.getRow()][pos.getCol()]);

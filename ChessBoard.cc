@@ -29,7 +29,7 @@ int ChessBoard::getDimension() const {
 }
 
 void ChessBoard::addGraphicsDisplay(XWindow& xw) {
-    graphicalDisplay = new GraphicsDisplay {xw, dimension};
+    graphicalDisplay = make_unique<GraphicsDisplay>(xw, dimension);
     for (int row = 1; row <= dimension; row++) {
         for (int col = 1; col <= dimension; col++) {
             graphicalDisplay->notify(board[row][col]);
@@ -38,7 +38,6 @@ void ChessBoard::addGraphicsDisplay(XWindow& xw) {
 }
 
 ChessBoard::~ChessBoard() {
-    delete graphicalDisplay;
 }
 
 std::ostream &operator<<(std::ostream &out, const ChessBoard& board) {

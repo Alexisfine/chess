@@ -6,6 +6,7 @@
 #include "Cell.h"
 #include "TextDisplay.h"
 #include "GraphicsDisplay.h"
+#include <memory>
 
 class Move;
 class Position;
@@ -26,8 +27,8 @@ protected:
     int dimension;
     std::vector<std::vector<Cell>> board;
     TextDisplay textDisplay;
-    GraphicsDisplay* graphicalDisplay;
-    std::vector<ChessPiece*> chessPieces;
+    std::unique_ptr<GraphicsDisplay> graphicalDisplay;
+    std::vector<std::unique_ptr<ChessPiece>> chessPieces;
 public:
     ChessBoard(int dimension);
     virtual ~ChessBoard();

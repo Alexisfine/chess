@@ -2,7 +2,7 @@
 #define CHESS_CHESSGAME_H
 
 #include "ChessBoard.h"
-#include <map>
+#include <memory>
 using namespace std;
 
 enum class GameResult {
@@ -23,8 +23,8 @@ class Position;
 enum class ChessColor;
 
 class ChessGame {
-    ChessBoard* chessBoard;
-    Player* players[2] = {nullptr, nullptr};
+    std::unique_ptr<ChessBoard> chessBoard;
+    std::unique_ptr<Player> players[2] = {nullptr, nullptr};
     double score[2] = {0, 0};
     bool isChecked[2] = {false, false};
     int currentTurn = 0;
