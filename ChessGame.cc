@@ -13,7 +13,7 @@ ChessGame::~ChessGame() {
     delete chessBoard;
 }
 
-void ChessGame::start(PlayerType pt1, PlayerType pt2) {
+void ChessGame::start(PlayerType pt1, PlayerType pt2, int level1, int level2) {
     delete players[0];
     delete players[1];
 
@@ -21,12 +21,17 @@ void ChessGame::start(PlayerType pt1, PlayerType pt2) {
         players[0] = new HumanPlayer{1, chessBoard, ChessColor::WHITE};
     } else {
         players[0] = new ComputerPlayer{1, chessBoard, ChessColor::WHITE};
+        auto compPlayer = dynamic_cast<ComputerPlayer*>(players[0]);
+        if (compPlayer) compPlayer->setLevel(level1);
     }
 
     if (pt2 == PlayerType::HUMAN) {
         players[1] = new HumanPlayer{2, chessBoard, ChessColor::BLACK};
     } else {
         players[1] = new ComputerPlayer{2, chessBoard, ChessColor::BLACK};
+        auto compPlayer = dynamic_cast<ComputerPlayer*>(players[1]);
+        if (compPlayer) compPlayer->setLevel(level2);
+
     }
 
     inGame = true;

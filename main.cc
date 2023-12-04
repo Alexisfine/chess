@@ -170,12 +170,27 @@ int main() {
             if (command == "game") {
                 string playerOneType;
                 string playerTwoType;
+                int level1 = 1;
+                int level2 = 1;
                 cin >> playerOneType;
                 cin >> playerTwoType;
-                pt1 = (playerOneType == "human") ? PlayerType::HUMAN : PlayerType::COMPUTER;
-                pt2 = (playerTwoType == "human") ? PlayerType::HUMAN : PlayerType::COMPUTER;
+                // Parse playerOne type and level
+                if (playerOneType == "human") {
+                    pt1 = PlayerType::HUMAN;
+                } else if (playerOneType.find("computer") != string::npos) {
+                    pt1 = PlayerType::COMPUTER;
+                    level1 = std::stoi(playerOneType.substr(9)); // Extract level from "computer[1-4]"
+                }
 
-                game.start(pt1, pt2);
+                // Parse playerOne type and level
+                if (playerTwoType == "human") {
+                    pt2 = PlayerType::HUMAN;
+                } else if (playerTwoType.find("computer") != string::npos) {
+                    pt2 = PlayerType::COMPUTER;
+                    level2 = std::stoi(playerTwoType.substr(9)); // Extract level from "computer[1-4]"
+                }
+
+                game.start(pt1, pt2, level1, level2);
                 cout << "Game begins" << endl;
                 cout << game << endl;
                 // stalemate setup

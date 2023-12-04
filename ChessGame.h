@@ -28,7 +28,7 @@ class ChessGame {
 public:
     ChessGame(int dimension, XWindow& xw);
     ~ChessGame();
-    void start(PlayerType pt1, PlayerType pt2);
+    void start(PlayerType pt1, PlayerType pt2, int level1 = 1, int level2 = 1);
     void resign();
     bool hasStarted();
     void addChess(const Position& pos, ChessColor color, ChessType chessType);

@@ -34,3 +34,11 @@ bool ValidMove::getPromotion() {
 void ValidMove::setPromotion(bool p) {
     promotion = p;
 }
+
+bool ValidMove::getCanCapture() const {
+    return canCapture;
+}
+
+bool ValidMove::getCanCheck() const {
+    return canCheck;
+}
