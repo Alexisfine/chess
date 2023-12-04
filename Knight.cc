@@ -20,10 +20,15 @@ std::vector<ValidMove> Knight::getAvailableMoves(ChessBoard& board, const Positi
         if (!board.isValidPos(newPosition)) continue; // check if newPosition is within the grid
         // check if newPosition is occupied by myself
         if (!board.isPositionEmpty(newPosition) && board.isPositionOccupiedByColor(newPosition, color)) continue;
-        bool canCheck = false; //  Implement Check Later
+        Move move {curPosition, newPosition, this};
+        ChessColor opponentColor = color == ChessColor::WHITE ? ChessColor::BLACK : ChessColor::WHITE;
+        bool canCheck = check && board.simulateMove(move, opponentColor);
+        int beCapturedScore = check ? board.simulateCapture(move, color).score : 0;
         bool canCapture = false;
         if (!board.isPositionEmpty(newPosition)) canCapture = true;
-        ValidMove possibleMove {curPosition, newPosition, this, canCapture, canCheck};
+        ValidMove possibleMove {curPosition, newPosition, this, canCapture, canCheck,
+                                canCapture ? board.getCellAtPos(newPosition).getChessPiece()->getScore() : 0,
+                                beCapturedScore};
         if (check) {
             bool willCheck = board.simulateMove(possibleMove, color);
             if (!willCheck) {

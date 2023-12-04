@@ -54,7 +54,13 @@ std::vector<ValidMove> Pawn::getAvailableMoves(ChessBoard& board, const Position
     std::vector<ValidMove> moves;
     Position newPosition {curPosition.getRow() + moveDy, curPosition.getCol() + moveDx};
     if (board.isValidPos(newPosition) && board.isPositionEmpty(newPosition)) {
-        ValidMove possibleMove {curPosition, newPosition, this, false, false};
+        bool canCapture = false;
+        Move move {curPosition, newPosition, this};
+        ChessColor opponentColor = color == ChessColor::WHITE ? ChessColor::BLACK : ChessColor::WHITE;
+        bool canCheck = check && board.simulateMove(move, opponentColor);
+        int beCapturedScore = check ? board.simulateCapture(move, color).score : 0;
+
+        ValidMove possibleMove {curPosition, newPosition, this, canCapture, canCheck, 0, beCapturedScore};
         if (checkPromotion(newPosition)) possibleMove.setPromotion(true);
         if (check) {
             bool willCheck = board.simulateMove(possibleMove, color);
@@ -62,7 +68,6 @@ std::vector<ValidMove> Pawn::getAvailableMoves(ChessBoard& board, const Position
         } else moves.emplace_back(possibleMove);
     }
 
-    bool canCheck = false;
 //    if (board.isValidPos(newPosition) && board.isPositionEmpty(newPosition)) {
 //        ValidMove possibleMove {curPosition, newPosition, this, false, canCheck};
 //        if (check) {
@@ -77,7 +82,12 @@ std::vector<ValidMove> Pawn::getAvailableMoves(ChessBoard& board, const Position
     if ((color == ChessColor::WHITE && curPosition.getRow() == 2) || (color == ChessColor::BLACK && curPosition.getRow() == 7)) {
         Position newPosition2 {curPosition.getRow() + moveDy * 2, curPosition.getCol() + moveDx * 2};
         if (board.isValidPos(newPosition2) && board.isPositionEmpty(newPosition) && board.isPositionEmpty(newPosition2)) {
-            ValidMove possibleMove2 {curPosition, newPosition2, this, false, canCheck};
+            bool canCapture = false;
+            Move move {curPosition, newPosition2, this};
+            ChessColor opponentColor = color == ChessColor::WHITE ? ChessColor::BLACK : ChessColor::WHITE;
+            bool canCheck = check && board.simulateMove(move, opponentColor);
+            int beCapturedScore = check ? board.simulateCapture(move, color).score : 0;
+            ValidMove possibleMove2 {curPosition, newPosition2, this, canCapture, canCheck, 0, beCapturedScore};
             if (checkPromotion(newPosition2)) possibleMove2.setPromotion(true);
             if (check) {
                 bool willCheck = board.simulateMove(possibleMove2, color);
@@ -92,7 +102,13 @@ std::vector<ValidMove> Pawn::getAvailableMoves(ChessBoard& board, const Position
     Position capture1 = {curPosition.getRow() + capture1y, curPosition.getCol() + capture1x};
     if (board.isValidPos(capture1)) {
         if (!board.isPositionEmpty(capture1) && !board.isPositionOccupiedByColor(capture1, color)) {
-            ValidMove captureMove1 {curPosition, capture1, this, true, canCheck};
+            bool canCapture = true;
+            Move move {curPosition, capture1, this};
+            ChessColor opponentColor = color == ChessColor::WHITE ? ChessColor::BLACK : ChessColor::WHITE;
+            bool canCheck = check && board.simulateMove(move, opponentColor);
+            int beCapturedScore = check ? board.simulateCapture(move, color).score : 0;
+            ValidMove captureMove1 {curPosition, capture1, this, canCapture, canCheck,
+                                    board.getCellAtPos(capture1).getChessPiece()->getScore(), beCapturedScore};
             if (checkPromotion(capture1)) captureMove1.setPromotion(true);
             if (check) {
                 bool willCheck = board.simulateMove(captureMove1, color);
@@ -105,7 +121,13 @@ std::vector<ValidMove> Pawn::getAvailableMoves(ChessBoard& board, const Position
     Position capture2 = {curPosition.getRow() + capture2y, curPosition.getCol() + capture2x};
     if (board.isValidPos(capture2)) {
         if (!board.isPositionEmpty(capture2) && !board.isPositionOccupiedByColor(capture2, color)) {
-            ValidMove captureMove2 {curPosition, capture2, this, true, canCheck};
+            bool canCapture = true;
+            Move move {curPosition, capture2, this};
+            ChessColor opponentColor = color == ChessColor::WHITE ? ChessColor::BLACK : ChessColor::WHITE;
+            bool canCheck = check && board.simulateMove(move, opponentColor);
+            int beCapturedScore = check ? board.simulateCapture(move, color).score : 0;
+            ValidMove captureMove2 {curPosition, capture2, this, canCapture, canCheck,
+                                    board.getCellAtPos(capture2).getChessPiece()->getScore(), beCapturedScore};
             if (checkPromotion(capture2)) captureMove2.setPromotion(true);
             if (check) {
                 bool willCheck = board.simulateMove(captureMove2, color);
@@ -125,8 +147,15 @@ std::vector<ValidMove> Pawn::getAvailableMoves(ChessBoard& board, const Position
             if (cp->getType() == ChessType::PAWN && cp->getTotalMoves() == 1) {
                 Pawn* pawn = dynamic_cast<Pawn*>(cp);
                 if (pawn->justMadeDoubleStep) {
+                    bool canCapture = true;
+                    Move move {curPosition, {curPosition.getRow() + 1, curPosition.getCol() - 1}, this};
+                    ChessColor opponentColor = color == ChessColor::WHITE ? ChessColor::BLACK : ChessColor::WHITE;
+                    bool canCheck = check && board.simulateMove(move, opponentColor);
+                    int beCapturedScore = check ? board.simulateCapture(move, color).score : 0;
+
                     ValidMove enPassantLeft {curPosition, {curPosition.getRow() + 1, curPosition.getCol() - 1},
-                                             this, true, canCheck};
+                                             this, canCapture, canCheck,
+                                             board.getCellAtPos(leftPos).getChessPiece()->getScore(), beCapturedScore};
                     enPassantLeft.isEnPassant();
                     if (check) {
                         bool willCheck = board.simulateEnPassant(enPassantLeft, color);
@@ -145,8 +174,15 @@ std::vector<ValidMove> Pawn::getAvailableMoves(ChessBoard& board, const Position
             if (cp->getType() == ChessType::PAWN && cp->getTotalMoves() == 1) {
                 Pawn* pawn = dynamic_cast<Pawn*>(cp);
                 if (pawn->justMadeDoubleStep) {
+                    bool canCapture = true;
+                    Move move {curPosition, {curPosition.getRow() + 1, curPosition.getCol() + 1}, this};
+                    ChessColor opponentColor = color == ChessColor::WHITE ? ChessColor::BLACK : ChessColor::WHITE;
+                    bool canCheck = check && board.simulateMove(move, opponentColor);
+                    int beCapturedScore = check ? board.simulateCapture(move, color).score : 0;
+
                     ValidMove enPassantRight {curPosition, {curPosition.getRow() + 1, curPosition.getCol() + 1},
-                                              this, true, canCheck};
+                                             this, canCapture, canCheck,
+                                             board.getCellAtPos(rightPos).getChessPiece()->getScore(), beCapturedScore};
                     enPassantRight.isEnPassant();
                     if (check) {
                         bool willCheck = board.simulateEnPassant(enPassantRight, color);
@@ -165,8 +201,15 @@ std::vector<ValidMove> Pawn::getAvailableMoves(ChessBoard& board, const Position
             if (cp->getType() == ChessType::PAWN && cp->getTotalMoves() == 1) {
                 Pawn* pawn = dynamic_cast<Pawn*>(cp);
                 if (pawn->justMadeDoubleStep) {
+                    bool canCapture = true;
+                    Move move {curPosition, {curPosition.getRow() - 1, curPosition.getCol() - 1}, this};
+                    ChessColor opponentColor = color == ChessColor::WHITE ? ChessColor::BLACK : ChessColor::WHITE;
+                    bool canCheck = check && board.simulateMove(move, opponentColor);
+                    int beCapturedScore = check ? board.simulateCapture(move, color).score : 0;
+
                     ValidMove enPassantLeft {curPosition, {curPosition.getRow() - 1, curPosition.getCol() - 1},
-                                             this, true, canCheck};
+                                              this, canCapture, canCheck,
+                                              board.getCellAtPos(leftPos).getChessPiece()->getScore(), beCapturedScore};
                     enPassantLeft.isEnPassant();
                     if (check) {
                         bool willCheck = board.simulateEnPassant(enPassantLeft, color);
@@ -185,8 +228,15 @@ std::vector<ValidMove> Pawn::getAvailableMoves(ChessBoard& board, const Position
             if (cp->getType() == ChessType::PAWN && cp->getTotalMoves() == 1) {
                 Pawn* pawn = dynamic_cast<Pawn*>(cp);
                 if (pawn->justMadeDoubleStep) {
+                    bool canCapture = true;
+                    Move move {curPosition, {curPosition.getRow() - 1, curPosition.getCol() + 1}, this};
+                    ChessColor opponentColor = color == ChessColor::WHITE ? ChessColor::BLACK : ChessColor::WHITE;
+                    bool canCheck = check && board.simulateMove(move, opponentColor);
+                    int beCapturedScore = check ? board.simulateCapture(move, color).score : 0;
                     ValidMove enPassantRight {curPosition, {curPosition.getRow() - 1, curPosition.getCol() + 1},
-                                              this, true, canCheck};
+                                             this, canCapture, canCheck,
+                                             board.getCellAtPos(rightPos).getChessPiece()->getScore(), beCapturedScore};
+
                     enPassantRight.isEnPassant();
                     if (check) {
                         bool willCheck = board.simulateEnPassant(enPassantRight, color);

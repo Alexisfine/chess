@@ -12,7 +12,15 @@ enum class GameResult {
     DRAW
 };
 
-
+class XWindow;
+enum class PlayerType;
+struct MoveResult;
+class ChessBoard;
+class Player;
+enum class ChessType;
+class Move;
+class Position;
+enum class ChessColor;
 
 class ChessGame {
     ChessBoard* chessBoard;
@@ -42,6 +50,7 @@ public:
     void erase();
     void promotePawn(ChessType chessType, const Position& pos);
     void completeSetup();
+    void postMove();
 
     friend std::ostream &operator<<(std::ostream &out, const ChessGame& game);
 

@@ -36,3 +36,27 @@ bool operator==(const ChessPiece& a, const ChessPiece& b) {
     return a.getType() == b.getType();
 }
 
+int ChessPiece::getScore() const {
+    int val = 0;
+    switch (type) {
+        case ChessType::KING:
+            val = 20;
+            break;
+        case ChessType::QUEEN:
+            val = 10;
+            break;
+        case ChessType::ROOK:
+            val = 5;
+            break;
+        case ChessType::BISHOP:
+            val = 3;
+            break;
+        case ChessType::KNIGHT:
+            val = 2;
+            break;
+        case ChessType::PAWN:
+            val = 1;
+            break;
+    }
+    return val;
+}

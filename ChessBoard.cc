@@ -55,3 +55,7 @@ void ChessBoard::completeSetup() {
         }
     }
 }
+
+TextDisplay& ChessBoard::getTextDisplay() {
+    return textDisplay;
+}

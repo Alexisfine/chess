@@ -39,6 +39,9 @@ void ChessGame::start(PlayerType pt1, PlayerType pt2, int level1, int level2) {
     isChecked[0] = false;
     isChecked[1] = false;
 
+    chessBoard->getTextDisplay().printMessage("Game begins");
+    chessBoard->getTextDisplay().printContent();
+
     int possibleMoves = 0;
     if (currentTurn == 0) {
         possibleMoves = chessBoard->getAllValidMoves(ChessColor::WHITE, true).size();
@@ -51,6 +54,12 @@ void ChessGame::start(PlayerType pt1, PlayerType pt2, int level1, int level2) {
         gameResult = GameResult::DRAW;
         score[0] += 0.5;
         score[1] += 0.5;
+    }
+
+    // stalemate setup
+    if (getResult() == GameResult::DRAW) {
+        chessBoard->getTextDisplay().printMessage("Stalemate");
+        init();
     }
 }
 
@@ -114,10 +123,13 @@ void ChessGame::resign() {
     if (currentTurn == 0) {
         score[1]++;
         gameResult = GameResult::BLACK_WON;
+        chessBoard->getTextDisplay().printMessage("Black wins!");
     } else {
         score[0]++;
         gameResult = GameResult::WHITE_WON;
+        chessBoard->getTextDisplay().printMessage("White wins!");
     }
+
 }
 
 std::ostream &operator<<(std::ostream &out, const ChessGame& game) {
@@ -249,4 +261,30 @@ void ChessGame::promotePawn(ChessType chessType, const Position& pos) {
 
 void ChessGame::completeSetup() {
     chessBoard->completeSetup();
+}
+
+void ChessGame::postMove() {
+    chessBoard->getTextDisplay().printContent();
+    auto isCheckMate = getIsChecked();
+    for (int i = 0; i < 2; i++) {
+        if (*(isCheckMate + i)) {
+            if (i == 0) {
+                chessBoard->getTextDisplay().printMessage("White is in check.");
+            } else {
+                chessBoard->getTextDisplay().printMessage("Black is in check.");
+            }
+        }
+    }
+
+    // game has ended
+    if (!hasStarted()) {
+        if (getResult() == GameResult::WHITE_WON) {
+            chessBoard->getTextDisplay().printMessage("Checkmate! White wins!");
+        } else if (getResult() == GameResult::BLACK_WON) {
+            chessBoard->getTextDisplay().printMessage("Checkmate! Black wins!");
+        } else {
+            chessBoard->getTextDisplay().printMessage("Stalemate");
+        }
+        init(); // reinitialized next game
+    }
 }

@@ -9,8 +9,11 @@ class ValidMove : public Move {
     bool canCheck;
     bool enPassant;
     bool promotion;
+    int capturedScore;
+    int beCapturedScore;
 public:
-    ValidMove(Position start, Position end, ChessPiece* chessPiece, bool canCapture, bool canCheck);
+    ValidMove(Position start, Position end, ChessPiece* chessPiece, bool canCapture, bool canCheck,
+              int capturedScore, int beCapturedScore);
     bool operator<(const ValidMove& other) const;
     Position getStart() const;
     Position getEnd() const;
@@ -20,6 +23,8 @@ public:
     bool getPromotion();
     bool getCanCapture() const;
     bool getCanCheck() const;
+    int getCapturedScore() const;
+    int getBeCapturedScore() const;
 };
 
 

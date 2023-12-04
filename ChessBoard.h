@@ -6,6 +6,7 @@
 #include "Cell.h"
 #include "TextDisplay.h"
 #include "GraphicsDisplay.h"
+
 class Move;
 class Position;
 class ChessPiece;
@@ -15,7 +16,10 @@ class ValidMove;
 struct MoveResult;
 class GraphicsDisplay;
 
-
+struct CapturedInfo {
+    bool isCaptured;
+    int score;
+};
 
 class ChessBoard {
 protected:
@@ -42,11 +46,12 @@ public:
     virtual bool verifySetup() = 0;
     virtual bool simulateMove(Move move, ChessColor color) = 0;
     virtual bool simulateEnPassant(Move move, ChessColor color) = 0;
-    virtual bool simulateCapture(Move move, ChessColor color) = 0;
+    virtual CapturedInfo simulateCapture(Move move, ChessColor color) = 0;
     virtual std::vector<ValidMove> getAllValidMoves(ChessColor color, bool check) = 0;
     void completeSetup();
     friend std::ostream &operator<<(std::ostream &out, const ChessBoard& board);
     void addGraphicsDisplay(XWindow& xw);
+    TextDisplay& getTextDisplay();
 };
 
 #endif //CHESS_CHESSBOARD_H
