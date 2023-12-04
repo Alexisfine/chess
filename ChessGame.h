@@ -48,6 +48,8 @@ public:
     bool verifySetup();
     void displayScore();
     GameResult getResult();
+    MoveResult executeCastling(const Move& move);
+    void updateCheckAndCheckmateStatus();
 };
 
 

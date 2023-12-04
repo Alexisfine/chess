@@ -7,7 +7,7 @@ public:
     King(ChessColor color);
     MoveResult isMovePossiblyValid(ChessBoard& board, const Move& move) override;
     std::vector<ValidMove> getAvailableMoves(ChessBoard& board, const Position& curPosition, bool check) override;
-
+    bool isCastlingAvailable(ChessBoard& board,const Position& kingPos, const Position& rookPos);
 };
 
 
