@@ -58,6 +58,30 @@ MoveResult TwoPlayerChessBoard::makeMove(Move move, ChessColor color) {
         remove(move.getEnd());
     }
 
+    //castling
+    if (move.getChessPiece()->getType() == ChessType::KING && abs(move.getStart().getCol() - move.getEnd().getCol()) == 2) {
+        Position kingStart = move.getStart();
+        Position kingEnd = move.getEnd();
+        // Determine rook's start and end positions based on king's move
+        bool isKingSide = kingEnd.getCol() > kingStart.getCol();
+        int rookStartCol = isKingSide ? 8 : 1;
+        int rookEndCol = isKingSide ? kingEnd.getCol() - 1 : kingEnd.getCol() + 1;
+        Position rookStart(kingStart.getRow(), rookStartCol);
+        Position rookEnd(kingStart.getRow(), rookEndCol);
+        //move Rook to new position
+        board[rookEnd.getRow()][rookEnd.getCol()].addChessPiece(board[rookStart.getRow()][rookStart.getCol()].getChessPiece());
+        remove(rookStart);
+        //increment Rook's moves
+        board[rookEnd.getRow()][rookEnd.getCol()].getChessPiece()->incrementTotalMoves();
+        //TextDisplay and Graphic Display of Rook's move
+        textDisplay.notify(board[rookStart.getRow()][rookStart.getCol()]);
+        textDisplay.notify(board[rookEnd.getRow()][rookEnd.getCol()]);
+        if (graphicalDisplay) {
+            graphicalDisplay->notify(board[rookStart.getRow()][rookStart.getCol()]);
+            graphicalDisplay->notify(board[rookEnd.getRow()][rookEnd.getCol()]);
+        }
+    }
+
     // en passant
     // update pawn's state
     if (move.getChessPiece()->getType() == ChessType::PAWN) {

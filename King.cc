@@ -33,5 +33,49 @@ std::vector<ValidMove> King::getAvailableMoves(ChessBoard& board, const Position
         }
 
     }
+    //castling
+    if (totalMoves == 0) {
+        int row = curPosition.getRow();
+        // Positions for rooks
+        Position rookPos1 = (color == ChessColor::WHITE) ? Position(1, 8) : Position(8, 8);
+        Position rookPos2 = (color == ChessColor::WHITE) ? Position(1, 1) : Position(8, 1);
+
+        // Check for Rook at rookPos1
+        if (isCastlingAvailable(board, curPosition, rookPos1)) {
+            Position newKingPos(row, curPosition.getCol() + 2);  // King's new position
+            ValidMove possibleMove {curPosition, newKingPos, this, false, false};
+            bool willCheck = board.simulateMove(possibleMove, color);
+            if (!willCheck) {
+                moves.emplace_back(possibleMove);
+            }
+        }
+
+        // Check for Rook at rookPos2
+        if (isCastlingAvailable(board, curPosition, rookPos2)) {
+            Position newKingPos(row, curPosition.getCol() - 2);  // King's new position
+            ValidMove possibleMove {curPosition, newKingPos, this, false, false};
+            bool willCheck = board.simulateMove(possibleMove, color);
+            if (!willCheck) {
+                moves.emplace_back(possibleMove);
+            }
+        }
+    }
+
     return moves;
+}
+
+bool King::isCastlingAvailable(ChessBoard& board,const Position& kingPos, const Position& rookPos) {
+    ChessPiece* rook = board.getCellAtPos(rookPos).getChessPiece();
+    if (rook && rook->getTotalMoves() == 0) { //check if rook is not removed
+        // Check if spaces between King and Rook are empty
+        int startCol = min(kingPos.getCol(), rookPos.getCol()) + 1;
+        int endCol = max(kingPos.getCol(), rookPos.getCol());
+        for (int col = startCol; col < endCol; ++col) {
+            if (!board.isPositionEmpty(Position(kingPos.getRow(), col))) {
+                return false;
+            }
+        }
+        return true; // All conditions met
+    }
+    return false; // Rook has moved or does not exist
 }
