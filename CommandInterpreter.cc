@@ -231,4 +231,3 @@ void CommandInterpreter::run() {
     }
     game.displayScore();
 }
-
