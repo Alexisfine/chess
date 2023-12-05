@@ -38,6 +38,9 @@ ChessType strToType(string str) {
         case 'R': case 'r':
             type = ChessType::ROOK;
             break;
+        case 'P': case 'p':
+            type = ChessType::PAWN;
+            break;
         default:
             throw invalid_argument("Invalid chess type");
     }
