@@ -1,7 +1,14 @@
 #include "CommandInterpreter.h"
+#include <iostream>
+#include <set>
+#include <stdexcept>
+#include <limits>
 using namespace std;
 
 Position strToPos(string str) {
+    if (str.length() != 2 || str[0] < 'a' || str[0] > 'h' || str[1] < '1' || str[1] > '8') {
+        throw invalid_argument("Invalid position format");
+    }
     char a = str[0];
     char b = str[1];
     int row = b - '0';
@@ -10,44 +17,33 @@ Position strToPos(string str) {
 }
 
 ChessType strToType(string str) {
+    if (str.empty()) {
+        throw invalid_argument("Invalid chess type");
+    }
+
     ChessType type;
     switch (str[0]) {
-        case 'K':
+        case 'K': case 'k':
             type = ChessType::KING;
             break;
-        case 'k':
-            type = ChessType::KING;
-            break;
-        case 'Q':
+        case 'Q': case 'q':
             type = ChessType::QUEEN;
             break;
-        case 'q':
-            type = ChessType::QUEEN;
-            break;
-        case 'B':
+        case 'B': case 'b':
             type = ChessType::BISHOP;
             break;
-        case 'b':
-            type = ChessType::BISHOP;
-            break;
-        case 'N':
+        case 'N': case 'n':
             type = ChessType::KNIGHT;
             break;
-        case 'n':
-            type = ChessType::KNIGHT;
-            break;
-        case 'R':
-            type = ChessType::ROOK;
-            break;
-        case 'r':
+        case 'R': case 'r':
             type = ChessType::ROOK;
             break;
         default:
-            type = ChessType::PAWN;
-            break;
+            throw invalid_argument("Invalid chess type");
     }
     return type;
 }
+
 
 ChessColor strToColor(string str) {
     if ('a' <= str[0] && str[0] <= 'z') {
@@ -58,6 +54,7 @@ ChessColor strToColor(string str) {
 CommandInterpreter::CommandInterpreter() {}
 
 void CommandInterpreter::run() {
+    set<string> validCommands = {"resign", "move", "game", "setup"};
     XWindow xw {};
     string command, aux;
     ChessGame game {8, xw};
@@ -65,6 +62,12 @@ void CommandInterpreter::run() {
     PlayerType pt2;
 
     while (cin >> command) {
+         if (validCommands.find(command) == validCommands.end()) {
+            cout << "Invalid command" << endl;
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cin.clear();
+            continue;
+        }
         if (game.hasStarted()) {
             if (command == "resign") {
                 ChessColor color = game.getCurrentColor();
@@ -77,6 +80,7 @@ void CommandInterpreter::run() {
                     game.autoMove(game.getCurrentColor());
 
                 } else {
+                    try {
                     string from;
                     string to;
                     cin >> from;
@@ -119,16 +123,20 @@ void CommandInterpreter::run() {
                         }
                         game.promotePawn(newChess, toPos);
                     }
-
                     if (!result.success) {
                         cout << "Invalid Move" << endl;
                         continue;
                     }
                 }
+                catch (const std::invalid_argument& e) {
+                    cout << "Error: " << e.what() << endl;
+                    continue;
+                }
                 game.postMove();
                 cin.ignore();
                 cin.clear();
             }
+        }
         } else {
             if (command == "game") {
                 string playerOneType;
@@ -170,15 +178,27 @@ void CommandInterpreter::run() {
                         string position;
                         cin >> type;
                         cin >> position;
-                        ChessType chessType = strToType(type);
-                        Position pos = strToPos(position);
-                        game.addChess(pos, strToColor(type), chessType);
-                        cout << game << endl;
+                        try {
+                            ChessType chessType = strToType(type);
+                            Position pos = strToPos(position);
+                            game.addChess(pos, strToColor(type), chessType);
+                            cout << game << endl;
+                        }
+                        catch (const std::invalid_argument& e) {
+                            cout << "Error: " << e.what() << endl;
+                            continue;
+                        }
                     } else if (aux == "-") {
                         string position;
                         cin >> position;
-                        game.removeChess(strToPos(position));
-                        cout << game << endl;
+                        try{
+                            game.removeChess(strToPos(position));
+                            cout << game << endl;
+                        }
+                        catch (const std::invalid_argument& e) {
+                            cout << "Error: " << e.what() << endl;
+                            continue;
+                        }
                     } else if (aux == "=") {
                         string color;
                         cin >> color;
@@ -213,3 +233,4 @@ void CommandInterpreter::run() {
     }
     game.displayScore();
 }
+
