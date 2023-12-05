@@ -2,7 +2,6 @@
 #include <iostream>
 #include <set>
 #include <stdexcept>
-#include <limits>
 using namespace std;
 
 Position strToPos(string str) {
@@ -67,7 +66,7 @@ void CommandInterpreter::run() {
     while (cin >> command) {
          if (validCommands.find(command) == validCommands.end()) {
             cout << "Invalid command" << endl;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cin.ignore(100, '\n');
             cin.clear();
             continue;
         }
@@ -92,37 +91,34 @@ void CommandInterpreter::run() {
 
                     MoveResult result = game.move(fromPos, toPos);
                     if (result.pawnPromotion) {
+                        bool validInput = false;
                         char promotedChess;
-                        cin >> promotedChess;
                         ChessType newChess;
-                        switch (promotedChess) {
-                            case 'Q':
-                                newChess = ChessType::QUEEN;
-                                break;
-                            case 'q':
-                                newChess = ChessType::QUEEN;
-                                break;
-                            case 'R':
-                                newChess = ChessType::ROOK;
-                                break;
-                            case 'r':
-                                newChess = ChessType::ROOK;
-                                break;
-                            case 'B':
-                                newChess = ChessType::BISHOP;
-                                break;
-                            case 'b':
-                                newChess = ChessType::BISHOP;
-                                break;
-                            case 'N':
-                                newChess = ChessType::KNIGHT;
-                                break;
-                            case 'n':
-                                newChess = ChessType::KNIGHT;
-                                break;
-                            default:
-                                newChess = ChessType::QUEEN;
-                        }
+                        while (!validInput) {                       
+                            cin >> promotedChess;                               
+                            switch (promotedChess) {
+                                case 'Q': case 'q':
+                                    newChess = ChessType::QUEEN;
+                                    validInput = true;
+                                    break;
+                                case 'R': case 'r':
+                                    newChess = ChessType::ROOK;
+                                    validInput = true;
+                                    break;
+                                case 'B': case 'b':
+                                    newChess = ChessType::BISHOP;
+                                    validInput = true;
+                                    break;
+                                case 'N': case 'n':
+                                    newChess = ChessType::KNIGHT;
+                                    validInput = true;
+                                    break;
+                                default:
+                                    cout << "Invalid Chess Type. Choose from Queen, Rook, Bishop, or Knight" << endl;
+                                    cin.clear();
+                                    cin.ignore(100, '\n');
+                            }
+                        } 
                         game.promotePawn(newChess, toPos);
                     }
                     if (!result.success) {
