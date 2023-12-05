@@ -57,6 +57,11 @@ ValidMove ComputerPlayer::getMove() {
                 return a.getCanCapture() > b.getCanCapture();
             }
         });
+        // if all moves will not cause capturing/becaptured, move randomly
+        if (moves[0].getCanCapture() == 0 && moves[0].getCanCheck() == 0 && !moves[0].getCanCheck()) {
+            int randomIndex = randomint(moves.size() - 1);
+            return moves[randomIndex];
+        }
         return moves[0];
     }
 
@@ -71,13 +76,17 @@ ValidMove ComputerPlayer::getMove() {
             score.emplace_back(i++, curScore);
         }
         int max = score[0].second;
-        int index = 0;
-        for (int i = 0; i < score.size(); i++) {
-            if (max <= score[i].second) {
+        std::vector<int> possibleMoves {0};
+        for (int i = 1; i < score.size(); i++) {
+            if (max < score[i].second) {
                 max = score[i].second;
-                index = score[i].first;
+                possibleMoves.clear();
+                possibleMoves.emplace_back(i);
+            } else if (max == score[i].second) {
+                possibleMoves.emplace_back(i);
             }
         }
+        int index = randomint(possibleMoves.size() - 1);
         return moves[index];
     }
     return moves[0];
