@@ -61,16 +61,24 @@ ValidMove ComputerPlayer::getMove() {
     }
 
     if (level == 4) {
-        std::sort(moves.begin(), moves.end(), [](const ValidMove& a, const ValidMove& b) {
-            int aScore = 0;
-            int bScore = 0;
-            if (a.getCanCheck()) aScore += 10;
-            if (b.getCanCheck()) bScore += 10;
-            aScore = aScore + a.getCapturedScore() + 2*a.getBeCapturedScore();
-            bScore = bScore + b.getBeCapturedScore() + 2*b.getBeCapturedScore();
-            return aScore > bScore;
+        std::vector<pair<int, int>> score;
+        int i = 0;
+        for (auto move : moves) {
+            int curScore = 0;
+            if (move.getCanCheck()) curScore += 10;
+            curScore += 3*move.getBeCapturedScore();
+            curScore += move.getCapturedScore();
+            score.emplace_back(i++, curScore);
         }
-        );
+        int max = score[0].second;
+        int index = 0;
+        for (int i = 0; i < score.size(); i++) {
+            if (max <= score[i].second) {
+                max = score[i].second;
+                index = score[i].first;
+            }
+        }
+        return moves[index];
     }
     return moves[0];
 }

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 #include <unistd.h>
-#include "Xwindow.h"
+#include "XWindow.h"
 
 using namespace std;
 

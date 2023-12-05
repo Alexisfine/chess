@@ -36,7 +36,6 @@ class Player;
 class ChessPiece {
 protected:
     ChessType type;
-    bool used;
     ChessColor color;
     int totalMoves = 0;
 public:
@@ -44,8 +43,6 @@ public:
     virtual ~ChessPiece();
     ChessType getType() const;
     ChessColor getColor() const;
-    bool isUsed() const;
-    void setUsed(bool setUsed);
     void incrementTotalMoves();
     virtual MoveResult isMovePossiblyValid(ChessBoard& board, const Move& move) = 0;
     virtual std::vector<ValidMove> getAvailableMoves(ChessBoard& board, const Position& curPosition, bool check) = 0;
