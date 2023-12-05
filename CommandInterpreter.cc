@@ -82,49 +82,49 @@ void CommandInterpreter::run() {
 
                 } else {
                     try {
-                    string from;
-                    string to;
-                    cin >> from;
-                    cin >> to;
-                    Position fromPos = strToPos(from);
-                    Position toPos = strToPos(to);
+                        string from;
+                        string to;
+                        cin >> from;
+                        cin >> to;
+                        Position fromPos = strToPos(from);
+                        Position toPos = strToPos(to);
 
-                    MoveResult result = game.move(fromPos, toPos);
-                    if (result.pawnPromotion) {
-                        bool validInput = false;
-                        char promotedChess;
-                        ChessType newChess;
-                        while (!validInput) {                       
-                            cin >> promotedChess;                               
-                            switch (promotedChess) {
-                                case 'Q': case 'q':
-                                    newChess = ChessType::QUEEN;
-                                    validInput = true;
-                                    break;
-                                case 'R': case 'r':
-                                    newChess = ChessType::ROOK;
-                                    validInput = true;
-                                    break;
-                                case 'B': case 'b':
-                                    newChess = ChessType::BISHOP;
-                                    validInput = true;
-                                    break;
-                                case 'N': case 'n':
-                                    newChess = ChessType::KNIGHT;
-                                    validInput = true;
-                                    break;
-                                default:
-                                    cout << "Invalid Chess Type. Choose from Queen, Rook, Bishop, or Knight" << endl;
-                                    cin.clear();
-                                    cin.ignore(100, '\n');
-                            }
-                        } 
-                        game.promotePawn(newChess, toPos);
-                    }
-                    if (!result.success) {
-                        cout << "Invalid Move" << endl;
-                        continue;
-                    }
+                        MoveResult result = game.move(fromPos, toPos);
+                        if (result.pawnPromotion) {
+                            bool validInput = false;
+                            char promotedChess;
+                            ChessType newChess;
+                            while (!validInput) {                       
+                                cin >> promotedChess;                               
+                                switch (promotedChess) {
+                                    case 'Q': case 'q':
+                                        newChess = ChessType::QUEEN;
+                                        validInput = true;
+                                        break;
+                                    case 'R': case 'r':
+                                        newChess = ChessType::ROOK;
+                                        validInput = true;
+                                        break;
+                                    case 'B': case 'b':
+                                        newChess = ChessType::BISHOP;
+                                        validInput = true;
+                                        break;
+                                    case 'N': case 'n':
+                                        newChess = ChessType::KNIGHT;
+                                        validInput = true;
+                                        break;
+                                    default:
+                                        cout << "Invalid Chess Type. Choose from Queen, Rook, Bishop, or Knight" << endl;
+                                        cin.clear();
+                                        cin.ignore(100, '\n');
+                                }
+                            } 
+                            game.promotePawn(newChess, toPos);
+                        }
+                        if (!result.success) {
+                            cout << "Invalid Move" << endl;
+                            continue;
+                        }
                 }
                 catch (const std::invalid_argument& e) {
                     cout << "Error: " << e.what() << endl;
