@@ -73,7 +73,6 @@ void CommandInterpreter::run() {
         }
         if (game.hasStarted()) {
             if (command == "resign") {
-                ChessColor color = game.getCurrentColor();
                 game.resign();
                 game.init();
             } else if (command == "move") {
@@ -135,11 +134,11 @@ void CommandInterpreter::run() {
                     cout << "Error: " << e.what() << endl;
                     continue;
                 }
+            }
                 game.postMove();
                 cin.ignore();
                 cin.clear();
             }
-        }
         } else {
             if (command == "game") {
                 string playerOneType;
@@ -153,7 +152,7 @@ void CommandInterpreter::run() {
                     pt1 = PlayerType::HUMAN;
                 } else if (playerOneType.find("computer") != string::npos) {
                     pt1 = PlayerType::COMPUTER;
-                    level1 = playerOneType[8] - '0'; // Extract level from "computer[1-4]"
+                    level1 = playerOneType[9] - '0'; // Extract level from "computer[1-4]"
                 }
 
                 // Parse playerOne type and level
@@ -161,7 +160,7 @@ void CommandInterpreter::run() {
                     pt2 = PlayerType::HUMAN;
                 } else if (playerTwoType.find("computer") != string::npos) {
                     pt2 = PlayerType::COMPUTER;
-                    level2 = playerTwoType[8] - '0'; // Extract level from "computer[1-4]"
+                    level2 = playerTwoType[9] - '0'; // Extract level from "computer[1-4]"
                 }
 
                 game.start(pt1, pt2, level1, level2);
