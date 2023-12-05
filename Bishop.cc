@@ -21,11 +21,16 @@ std::vector<ValidMove> Bishop::addPossibleMoveByDirection(ChessBoard& board,
         if (!board.isValidPos(newPosition)) return newMoves; // check if position is valid
         const Cell& cell = board.getCellAtPos(newPosition);
         bool canCapture = false;
-        bool canCheck = false;
+        Move move {curPosition, newPosition, this};
+        ChessColor opponentColor = color == ChessColor::WHITE ? ChessColor::BLACK : ChessColor::WHITE;
+        bool canCheck = check && board.simulateMove(move, opponentColor);
+        int beCapturedScore = check ? board.simulateCapture(move, color).score : 0;
+
         if (cell.isOccupied()) {
             canCapture = true;
             if (!cell.isOccupiedByColor(color)) {
-                ValidMove possibleMove {curPosition, newPosition, this, canCapture, canCheck};
+                ValidMove possibleMove {curPosition, newPosition, this, canCapture,
+                                        canCheck, cell.getChessPiece()->getScore(), beCapturedScore};
                 if (check) {
                     bool willCheck = board.simulateMove(possibleMove, color);
                     if (!willCheck) {
@@ -38,7 +43,7 @@ std::vector<ValidMove> Bishop::addPossibleMoveByDirection(ChessBoard& board,
             break; //cannot move pass another chesspiece
         }
         //if the cell is not occupied
-        ValidMove possibleMove {curPosition, newPosition, this, canCapture, canCheck};
+        ValidMove possibleMove {curPosition, newPosition, this, canCapture, canCheck, 0, beCapturedScore};
         if (check) {
             bool willCheck = board.simulateMove(possibleMove, color);
             if (!willCheck) newMoves.emplace_back(possibleMove);

@@ -18,10 +18,14 @@ std::vector<ValidMove> King::getAvailableMoves(ChessBoard& board, const Position
         if (!board.isValidPos(newPosition)) continue; // check if newPosition is within the grid
         // check if newPosition is occupied by myself
         if (!board.isPositionEmpty(newPosition) && board.isPositionOccupiedByColor(newPosition, color)) continue;
-        bool canCheck = false; //  Implement Check Later
-        bool canCapture = false;
-        if (!board.isPositionEmpty(newPosition)) canCapture = true;
-        ValidMove possibleMove {curPosition, newPosition, this, canCapture, canCheck};
+
+        Move move {curPosition, newPosition, this};
+        ChessColor opponentColor = color == ChessColor::WHITE ? ChessColor::BLACK : ChessColor::WHITE;
+        bool canCheck = check && board.simulateMove(move, opponentColor);
+        bool canCapture = !board.isPositionEmpty(newPosition) && board.isPositionOccupiedByColor(newPosition, color);
+        int capturedScore = canCapture ? board.getCellAtPos(newPosition).getChessPiece()->getScore() : 0;
+        int beCapturedScore = check ? board.simulateCapture(move, color).score : 0;
+        ValidMove possibleMove {curPosition, newPosition, this, canCapture, canCheck, capturedScore, beCapturedScore};
         if (check) {
             bool willCheck = board.simulateMove(possibleMove, color);
             if (!willCheck) {
@@ -43,21 +47,25 @@ std::vector<ValidMove> King::getAvailableMoves(ChessBoard& board, const Position
         // Check for Rook at rookPos1
         if (isCastlingAvailable(board, curPosition, rookPos1)) {
             Position newKingPos(row, curPosition.getCol() + 2);  // King's new position
-            ValidMove possibleMove {curPosition, newKingPos, this, false, false};
-            bool willCheck = board.simulateMove(possibleMove, color);
-            if (!willCheck) {
-                moves.emplace_back(possibleMove);
-            }
+            ValidMove possibleMove {curPosition, newKingPos, this, false, false, 0, 0};
+            if (check) {
+                bool willCheck = board.simulateMove(possibleMove, color);
+                if (!willCheck) {
+                    moves.emplace_back(possibleMove);
+                }
+            } else moves.emplace_back(possibleMove);
         }
 
         // Check for Rook at rookPos2
         if (isCastlingAvailable(board, curPosition, rookPos2)) {
             Position newKingPos(row, curPosition.getCol() - 2);  // King's new position
-            ValidMove possibleMove {curPosition, newKingPos, this, false, false};
-            bool willCheck = board.simulateMove(possibleMove, color);
-            if (!willCheck) {
-                moves.emplace_back(possibleMove);
-            }
+            ValidMove possibleMove {curPosition, newKingPos, this, false, false, 0, 0};
+            if (check) {
+                bool willCheck = board.simulateMove(possibleMove, color);
+                if (!willCheck) {
+                    moves.emplace_back(possibleMove);
+                }
+            } else moves.emplace_back(possibleMove);
         }
     }
 

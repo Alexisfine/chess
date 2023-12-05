@@ -83,3 +83,10 @@ std::ostream &operator<<(std::ostream &out, const TextDisplay &td) {
     }
     return out;
 }
+
+void TextDisplay::printContent() {
+    cout << (*this) << endl;
+}
+void TextDisplay::printMessage(string msg) {
+    cout << msg << endl;
+}

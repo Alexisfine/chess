@@ -2,7 +2,7 @@
 #define CHESS_CHESSGAME_H
 
 #include "ChessBoard.h"
-#include <map>
+#include <memory>
 using namespace std;
 
 enum class GameResult {
@@ -12,11 +12,19 @@ enum class GameResult {
     DRAW
 };
 
-
+class XWindow;
+enum class PlayerType;
+struct MoveResult;
+class ChessBoard;
+class Player;
+enum class ChessType;
+class Move;
+class Position;
+enum class ChessColor;
 
 class ChessGame {
-    ChessBoard* chessBoard;
-    Player* players[2] = {nullptr, nullptr};
+    std::unique_ptr<ChessBoard> chessBoard;
+    std::unique_ptr<Player> players[2] = {nullptr, nullptr};
     double score[2] = {0, 0};
     bool isChecked[2] = {false, false};
     int currentTurn = 0;
@@ -42,6 +50,7 @@ public:
     void erase();
     void promotePawn(ChessType chessType, const Position& pos);
     void completeSetup();
+    void postMove();
 
     friend std::ostream &operator<<(std::ostream &out, const ChessGame& game);
 

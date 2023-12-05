@@ -9,27 +9,22 @@ ChessGame::ChessGame(int dimension, XWindow& xw) : chessBoard{new TwoPlayerChess
 }
 
 ChessGame::~ChessGame() {
-    for (auto player : players) delete player;
-    delete chessBoard;
 }
 
 void ChessGame::start(PlayerType pt1, PlayerType pt2, int level1, int level2) {
-    delete players[0];
-    delete players[1];
-
     if (pt1 == PlayerType::HUMAN) {
-        players[0] = new HumanPlayer{1, chessBoard, ChessColor::WHITE};
+        players[0] = std::make_unique<HumanPlayer>(1, chessBoard.get(), ChessColor::WHITE);
     } else {
-        players[0] = new ComputerPlayer{1, chessBoard, ChessColor::WHITE};
-        auto compPlayer = dynamic_cast<ComputerPlayer*>(players[0]);
+        players[0] = std::make_unique<ComputerPlayer>(1, chessBoard.get(), ChessColor::WHITE);
+        auto compPlayer = dynamic_cast<ComputerPlayer*>(players[0].get());
         if (compPlayer) compPlayer->setLevel(level1);
     }
 
     if (pt2 == PlayerType::HUMAN) {
-        players[1] = new HumanPlayer{2, chessBoard, ChessColor::BLACK};
+        players[1] = std::make_unique<HumanPlayer>(2, chessBoard.get(), ChessColor::BLACK);
     } else {
-        players[1] = new ComputerPlayer{2, chessBoard, ChessColor::BLACK};
-        auto compPlayer = dynamic_cast<ComputerPlayer*>(players[1]);
+        players[1] = std::make_unique<ComputerPlayer>(2, chessBoard.get(), ChessColor::BLACK);
+        auto compPlayer = dynamic_cast<ComputerPlayer*>(players[1].get());
         if (compPlayer) compPlayer->setLevel(level2);
 
     }
@@ -38,6 +33,9 @@ void ChessGame::start(PlayerType pt1, PlayerType pt2, int level1, int level2) {
     gameResult = GameResult::IN_PROGRESS;
     isChecked[0] = false;
     isChecked[1] = false;
+
+    chessBoard->getTextDisplay().printMessage("Game begins");
+    chessBoard->getTextDisplay().printContent();
 
     int possibleMoves = 0;
     if (currentTurn == 0) {
@@ -51,6 +49,12 @@ void ChessGame::start(PlayerType pt1, PlayerType pt2, int level1, int level2) {
         gameResult = GameResult::DRAW;
         score[0] += 0.5;
         score[1] += 0.5;
+    }
+
+    // stalemate setup
+    if (getResult() == GameResult::DRAW) {
+        chessBoard->getTextDisplay().printMessage("Stalemate");
+        init();
     }
 }
 
@@ -69,8 +73,8 @@ MoveResult ChessGame::makeMove(const Position& from, const Position& to) {
         isChecked[0] = true;
     } else isChecked[0] = false;
 
-    for (auto player : players) {
-        if (chessBoard->isColorInCheckMate(player->getColor())) {
+    for (int i = 0; i < 2; i++) {
+        if (chessBoard->isColorInCheckMate(players[i]->getColor())) {
             inGame = false;
             if (currentTurn == 0) {
                 score[1]++;
@@ -114,10 +118,13 @@ void ChessGame::resign() {
     if (currentTurn == 0) {
         score[1]++;
         gameResult = GameResult::BLACK_WON;
+        chessBoard->getTextDisplay().printMessage("Black wins!");
     } else {
         score[0]++;
         gameResult = GameResult::WHITE_WON;
+        chessBoard->getTextDisplay().printMessage("White wins!");
     }
+
 }
 
 std::ostream &operator<<(std::ostream &out, const ChessGame& game) {
@@ -170,7 +177,6 @@ GameResult ChessGame::getResult() {
 void ChessGame::init() {
     chessBoard->refresh();
     setCurrentTurn(ChessColor::WHITE);
-    for (auto player : players) delete player;
     players[0] = nullptr;
     players[1] = nullptr;
 }
@@ -179,7 +185,7 @@ bool ChessGame::autoMove(ChessColor color) {
     MoveResult res;
     if (color == ChessColor::WHITE) {
         if (players[0]->getPlayerType() != PlayerType::COMPUTER) return false;
-        ComputerPlayer* player = dynamic_cast<ComputerPlayer*>(players[0]);
+        ComputerPlayer* player = dynamic_cast<ComputerPlayer*>(players[0].get());
         ValidMove move = player->getMove();
         res = chessBoard->makeMove(move, color);
         if (res.success && res.pawnPromotion) {
@@ -188,7 +194,7 @@ bool ChessGame::autoMove(ChessColor color) {
         }
     } else {
         if (players[1]->getPlayerType() != PlayerType::COMPUTER) return false;
-        ComputerPlayer* player = dynamic_cast<ComputerPlayer*>(players[1]);
+        ComputerPlayer* player = dynamic_cast<ComputerPlayer*>(players[1].get());
         ValidMove move = player->getMove();
         res = chessBoard->makeMove(move, color);
         if (res.success && res.pawnPromotion) {
@@ -233,8 +239,8 @@ void ChessGame::promotePawn(ChessType chessType, const Position& pos) {
     } else isChecked[0] = false;
 
 
-    for (auto player : players) {
-        if (chessBoard->isColorInCheckMate(player->getColor())) {
+    for (int i = 0; i < 2; i++) {
+        if (chessBoard->isColorInCheckMate(players[i]->getColor())) {
             inGame = false;
             if (currentTurn == 0) {
                 score[1]++;
@@ -249,4 +255,30 @@ void ChessGame::promotePawn(ChessType chessType, const Position& pos) {
 
 void ChessGame::completeSetup() {
     chessBoard->completeSetup();
+}
+
+void ChessGame::postMove() {
+    chessBoard->getTextDisplay().printContent();
+    auto isCheckMate = getIsChecked();
+    for (int i = 0; i < 2; i++) {
+        if (*(isCheckMate + i)) {
+            if (i == 0) {
+                chessBoard->getTextDisplay().printMessage("White is in check.");
+            } else {
+                chessBoard->getTextDisplay().printMessage("Black is in check.");
+            }
+        }
+    }
+
+    // game has ended
+    if (!hasStarted()) {
+        if (getResult() == GameResult::WHITE_WON) {
+            chessBoard->getTextDisplay().printMessage("Checkmate! White wins!");
+        } else if (getResult() == GameResult::BLACK_WON) {
+            chessBoard->getTextDisplay().printMessage("Checkmate! Black wins!");
+        } else {
+            chessBoard->getTextDisplay().printMessage("Stalemate");
+        }
+        init(); // reinitialized next game
+    }
 }

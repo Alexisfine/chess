@@ -11,7 +11,6 @@ void TwoPlayerChessBoard::setupBoard() {
             remove({row, col});
         }
     }
-    for (auto chess : chessPieces) delete chess;
     chessPieces.clear();
 
     for (int col = 1; col <= dimension; col++) {
@@ -139,7 +138,6 @@ bool TwoPlayerChessBoard::isValidPos(const Position& pos) const {
 }
 
 TwoPlayerChessBoard::~TwoPlayerChessBoard() {
-    for (auto chess : chessPieces) delete chess;
 }
 
 
@@ -160,6 +158,7 @@ bool TwoPlayerChessBoard::isColorInCheck(ChessColor color) {
                 king = board[row][col].getChessPiece();
                 kingRow = row;
                 kingCol = col;
+                break;
             }
         }
     }
@@ -229,29 +228,30 @@ bool TwoPlayerChessBoard::simulateMove(Move move, ChessColor color) {
 }
 
 void TwoPlayerChessBoard::addTo(const Position& pos, ChessColor color, ChessType chessType) {
-    ChessPiece* newPiece;
+    std::unique_ptr<ChessPiece> newPiece;
     switch (chessType) {
         case ChessType::KING:
-            newPiece = new King {color};
+            newPiece = std::make_unique<King>(color);
             break;
         case ChessType::QUEEN:
-            newPiece = new Queen {color};
+            newPiece = std::make_unique<Queen>(color);
             break;
         case ChessType::BISHOP:
-            newPiece = new Bishop {color};
+            newPiece = std::make_unique<Bishop>(color);
             break;
         case ChessType::ROOK:
-            newPiece = new Rook {color};
+            newPiece = std::make_unique<Rook>(color);
             break;
         case ChessType::KNIGHT:
-            newPiece = new Knight{color};
+            newPiece = std::make_unique<Knight>(color);
             break;
         case ChessType::PAWN:
-            newPiece = new Pawn{color};
+            newPiece = std::make_unique<Pawn>(color);
             break;
     }
-    chessPieces.emplace_back(newPiece);
-    board[pos.getRow()][pos.getCol()].addChessPiece(newPiece);
+    board[pos.getRow()][pos.getCol()].addChessPiece(newPiece.get());
+    chessPieces.emplace_back(std::move(newPiece));
+
     textDisplay.notify(board[pos.getRow()][pos.getCol()]);
     if (graphicalDisplay) {
         graphicalDisplay->notify(board[pos.getRow()][pos.getCol()]);
@@ -320,7 +320,7 @@ bool TwoPlayerChessBoard::simulateEnPassant(Move move, ChessColor color) {
 }
 
 //return true if the piece can be captured by opponent's piece in the next move
-bool TwoPlayerChessBoard::simulateCapture(Move move, ChessColor color) {
+CapturedInfo TwoPlayerChessBoard::simulateCapture(Move move, ChessColor color) {
     Position start = move.getStart();
     Position end = move.getEnd();
     ChessPiece* movedPiece = move.getChessPiece();
@@ -334,23 +334,22 @@ bool TwoPlayerChessBoard::simulateCapture(Move move, ChessColor color) {
 
     // Check if any opponent's piece can capture the moved piece
     bool canBeCaptured = false;
+    int capturedScore = 0;
     for (int row = 1; row <= getDimension(); ++row) {
         for (int col = 1; col <= getDimension(); ++col) {
             Position pos(row, col);
             const Cell& cell = board[pos.getRow()][pos.getCol()];
             if (cell.isOccupied() && cell.getChessPiece()->getColor() != color) {
                 // Check each of the opponent's piece's valid moves
-                std::vector<ValidMove> opponentMoves = cell.getChessPiece()->getAvailableMoves(*this, pos, true);
+                std::vector<ValidMove> opponentMoves = cell.getChessPiece()->getAvailableMoves(*this, pos, false);
                 for (const ValidMove& oppMove : opponentMoves) {
                     if (oppMove.getEnd() == end) {
                         canBeCaptured = true;
-                        break;
+                        capturedScore = min(capturedScore, -cell.getChessPiece()->getScore());
                     }
                 }
             }
-            if (canBeCaptured) break;
         }
-        if (canBeCaptured) break;
     }
 
     // Undo the move
@@ -361,6 +360,6 @@ bool TwoPlayerChessBoard::simulateCapture(Move move, ChessColor color) {
         board[end.getRow()][end.getCol()].removeChessPiece();
     }
 
-    return canBeCaptured;
+    return {canBeCaptured, capturedScore};
 }
 

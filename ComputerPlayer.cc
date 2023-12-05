@@ -2,6 +2,7 @@
 #include "ValidMove.h"
 #include <random>
 #include <vector>
+#include <algorithm>
 
 ComputerPlayer::ComputerPlayer(int playerNo, ChessBoard *board, const ChessColor &color) :
     Player{playerNo, PlayerType::COMPUTER, board, color} {}
@@ -23,40 +24,63 @@ int ComputerPlayer::randomint(int size) {
 }
 
 ValidMove ComputerPlayer::getMove() {
-    // if (level == 1) {
-    //     vector<ValidMove> moves = board->getAllValidMoves(color, true);
-    //     int randomIndex = randomint(moves.size() - 1); //generate a random integer
-    //     return moves[randomIndex];
-    // }
-    vector<ValidMove> moves = board->getAllValidMoves(color, true);
-    vector<ValidMove> priorityMoves;
-    if (level >= 2) {
-        for (const auto& move : moves) {
-            if (move.getCanCapture() || move.getCanCheck()) {
-                priorityMoves.push_back(move);
-            }
-        }
+     if (level == 1) {
+         vector<ValidMove> moves = board->getAllValidMoves(color, true);
+         int randomIndex = randomint(moves.size() - 1); //generate a random integer
+         return moves[randomIndex];
+     }
+
+     vector<ValidMove> moves = board->getAllValidMoves(color, true);
+    if (level == 2) {
+     std::sort(moves.begin(), moves.end(), [](const ValidMove& a, const ValidMove& b) {
+         if (a.getCanCheck() != b.getCanCheck()) {
+             // Moves where 'canCheck' is true come first
+             return a.getCanCheck() > b.getCanCheck();
+         } else {
+             // Among moves with the same 'canCheck' status, sort by 'canCapture'
+             return a.getCanCapture() > b.getCanCapture();
+         }
+     });
+     return moves[0];
     }
 
-    // For Level 2, choose randomly among capturing or checking moves, if available
-    if (level == 2 && !priorityMoves.empty()) {
-        return priorityMoves[randomint(priorityMoves.size() - 1)];
-    }
-
-    // For Level 3, add moves that reduce potential captures by the opponent
     if (level == 3) {
-        for (const auto& move : moves) {
-            if (!board->simulateCapture(move, color)) {
-                priorityMoves.push_back(move);
+        std::sort(moves.begin(), moves.end(), [](const ValidMove& a, const ValidMove& b) {
+            if (a.getBeCapturedScore() != b.getBeCapturedScore()) {
+                return a.getBeCapturedScore() > b.getBeCapturedScore();
             }
-        }
-        if (!priorityMoves.empty()) {
-            return priorityMoves[randomint(priorityMoves.size() - 1)];
-        }
+            else if (a.getCanCheck() != b.getCanCheck()) {
+                // Moves where 'canCheck' is true come first
+                return a.getCanCheck() > b.getCanCheck();
+            } else {
+                // Among moves with the same 'canCheck' status, sort by 'canCapture'
+                return a.getCanCapture() > b.getCanCapture();
+            }
+        });
+        return moves[0];
     }
 
-    // If no priority moves are available, or if level is 1, make a random move
-    return moves[randomint(moves.size() - 1)];
+    if (level == 4) {
+        std::vector<pair<int, int>> score;
+        int i = 0;
+        for (auto move : moves) {
+            int curScore = 0;
+            if (move.getCanCheck()) curScore += 10;
+            curScore += 3*move.getBeCapturedScore();
+            curScore += move.getCapturedScore();
+            score.emplace_back(i++, curScore);
+        }
+        int max = score[0].second;
+        int index = 0;
+        for (int i = 0; i < score.size(); i++) {
+            if (max <= score[i].second) {
+                max = score[i].second;
+                index = score[i].first;
+            }
+        }
+        return moves[index];
+    }
+    return moves[0];
 }
     //select a random cell from AllChessPiece
 //    while (true) {

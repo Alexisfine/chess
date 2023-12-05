@@ -1,6 +1,7 @@
 #ifndef __TEXTDISPLAY_H__
 #define __TEXTDISPLAY_H__
 #include <iostream>
+#include <string>
 #include <vector>
 #include "XDisplay.h"
 
@@ -13,6 +14,8 @@ class TextDisplay: public XDisplay {
   void notify(Cell &c) override;
   ~TextDisplay() override;
   friend std::ostream &operator<<(std::ostream &out, const TextDisplay &td);
+  void printContent();
+  void printMessage(std::string msg);
 };
 
 #endif
